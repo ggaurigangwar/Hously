@@ -1,123 +1,134 @@
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
+import { useNavigate, Link, useOutletContext } from 'react-router-dom';
+import { ArrowRight, Box } from 'lucide-react';
+import { Canvas } from '@react-three/fiber';
+import { AuthBackground3D } from '../components/ThreeDSequence';
 import { motion } from 'framer-motion';
-import { ArrowLeft, User, Mail, ShieldAlert, Lock } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
-import { TiltCard } from '../components/TiltCard';
-import puter from '@heyputer/puter.js';
 
 export function Signup() {
-  const navigate = useNavigate();
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isRegistering, setIsRegistering] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const { signInLocally } = useOutletContext<any>();
 
-  const handleSignUp = async (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsRegistering(true);
-    
-    try {
-      const signedIn = await puter.signIn();
-      if (signedIn) {
-        navigate('/upload');
-      }
-    } catch (err) {
-      console.error("Sign in failed", err);
-    } finally {
-      setIsRegistering(false);
-    }
+    setLoading(true);
+    await new Promise(r => setTimeout(r, 800));
+    signInLocally({
+      id: "usr_" + Math.random().toString(36).substring(2, 9),
+      username: username || "New Architect",
+      email: email || "unknown@system.local"
+    });
+    navigate('/upload');
   };
 
   return (
-    <div className="flex w-full min-h-[90vh] items-center justify-center px-4 relative overflow-hidden bg-background">
-      <div className="orb-1" />
-
-      <div className="absolute top-8 left-8 z-10">
-        <Link to="/" className="flex items-center gap-2 text-foreground/80 hover:text-primary transition-colors font-semibold bg-background/50 px-4 py-2 rounded-xl backdrop-blur-md">
-          <ArrowLeft className="w-5 h-5" />
-          Back
-        </Link>
+    <div className="relative w-full min-h-screen bg-[#FAF9F6] overflow-hidden flex items-center justify-center">
+      {/* Immersive Pastel Architectural 3D Background */}
+      <div className="absolute inset-0 z-0 opacity-80 pointer-events-none mix-blend-multiply">
+        <Canvas camera={{ position: [5, 3, 5], fov: 40 }} gl={{ antialias: true }}>
+           <Suspense fallback={null}>
+             <AuthBackground3D />
+           </Suspense>
+        </Canvas>
+      </div>
+      
+      {/* Background Graphic elements to enhance Vogue Magazine feel */}
+      <div className="absolute bottom-12 right-12 md:bottom-24 md:right-24 z-10 pointer-events-none text-right">
+         <h1 className="text-[5rem] md:text-[9rem] font-bold text-[#FFB5A7]/20 tracking-tighter leading-none select-none mix-blend-darken">
+           Registry.
+         </h1>
+         <p className="text-xl md:text-3xl font-medium text-[#CDB4DB]/50 tracking-widest uppercase mt-4 select-none mix-blend-darken">
+           Enlist Node
+         </p>
       </div>
 
-      <div style={{ perspective: "1500px" }} className="w-full max-w-md z-10">
-        <TiltCard depth={12}>
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9, rotateY: -10 }}
-            animate={{ opacity: 1, scale: 1, rotateY: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="w-full aether-card p-10 md:p-12 flex flex-col relative"
-          >
-            <div className="w-14 h-14 rounded-2xl border border-primary/20 bg-background flex items-center justify-center mb-8 shadow-inner shadow-primary/10">
-              <ShieldAlert className="w-6 h-6 text-primary" />
+      <motion.div 
+        initial={{ opacity: 0, y: -40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+        className="w-full max-w-[500px] z-20 mx-4"
+      >
+        <div className="bg-white/40 backdrop-blur-3xl border border-white/60 p-10 md:p-14 rounded-3xl shadow-[0_40px_100px_rgba(255,181,167,0.15)] relative overflow-hidden">
+          
+          <div className="absolute inset-0 opacity-[0.03] bg-[url('https://grainy-gradients.vercel.app/noise.svg')] pointer-events-none" />
+
+          <div className="flex items-center justify-end gap-3 mb-10">
+             <span className="text-sm tracking-[0.2em] font-extrabold text-[#2C2C2A] uppercase">Initial Setup</span>
+             <div className="w-10 h-10 bg-[#FAF9F6] border border-[#EAE6DF] rounded-xl flex items-center justify-center shadow-sm">
+                <Box className="w-5 h-5 text-[#2C2C2A]" />
+             </div>
+          </div>
+
+          <h2 className="text-4xl font-bold tracking-tighter text-[#2C2C2A] mb-8 leading-tight">
+             Define your <br/>
+             <span className="italic font-normal text-[#8C847A]">Design Space.</span>
+          </h2>
+
+          <form onSubmit={handleSignup} className="space-y-5 relative z-10">
+            <div className="space-y-1">
+              <label className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-[#8C847A] ml-2">Alias</label>
+              <input 
+                type="text" 
+                value={username}
+                onChange={e => setUsername(e.target.value)}
+                className="w-full bg-[#FAF9F6]/50 border border-white/50 rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-[#FFB5A7]/50 transition-all font-bold text-[#2C2C2A] placeholder-[#8C847A]/30 backdrop-blur-sm"
+                placeholder="Architect Name" 
+                disabled={loading}
+                required
+              />
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-[#8C847A] ml-2">Network Email</label>
+              <input 
+                type="email" 
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                className="w-full bg-[#FAF9F6]/50 border border-white/50 rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-[#FFB5A7]/50 transition-all font-bold text-[#2C2C2A] placeholder-[#8C847A]/30 backdrop-blur-sm"
+                placeholder="hello@studio.design" 
+                disabled={loading}
+                required
+              />
             </div>
             
-            <h1 className="text-4xl font-bold text-foreground mb-3 tracking-tight">Create Account</h1>
-            <p className="text-foreground/60 mb-10 font-medium">Join the vanguard of precision architecture.</p>
-
-            <form onSubmit={handleSignUp} className="flex flex-col gap-6 relative z-10">
-               <div className="flex flex-col gap-2">
-                <label className="text-[13px] font-bold text-primary uppercase tracking-widest pl-1">Username</label>
-                <div className="relative">
-                  <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-primary" />
-                  <input 
-                    type="text" 
-                    required
-                    className="tactile-input w-full pl-12" 
-                    placeholder="E.g. Le Corbusier"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                  />
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <label className="text-[13px] font-bold text-primary uppercase tracking-widest pl-1">Email Address</label>
-                <div className="relative">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-primary" />
-                  <input 
-                    type="email"
-                    required 
-                    className="tactile-input w-full pl-12" 
-                    placeholder="mail@hously.cloud"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <label className="text-[13px] font-bold text-primary uppercase tracking-widest pl-1">Password</label>
-                <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-primary" />
-                  <input 
-                    type="password"
-                    required 
-                    className="tactile-input w-full pl-12" 
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={isRegistering}
-                className="tactile-button mt-4 justify-between w-full"
-              >
-                {isRegistering ? "Processing..." : "Generate Access"}
-                <span className="bg-white/20 px-2 py-0.5 rounded-md opacity-80 text-xs shadow-sm">Secure</span>
-              </button>
-            </form>
-
-            <div className="mt-8 text-center pt-8 border-t border-border">
-              <p className="text-sm font-semibold text-foreground/70">
-                Already verified? <Link to="/login" className="text-primary hover:text-indigo-800 transition-colors font-bold underline decoration-2 underline-offset-4">Log in</Link>
-              </p>
+            <div className="space-y-1">
+              <label className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-[#8C847A] ml-2">Encryption Key</label>
+              <input 
+                type="password" 
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                className="w-full bg-[#FAF9F6]/50 border border-white/50 rounded-2xl px-5 py-4 focus:outline-none focus:ring-2 focus:ring-[#FFB5A7]/50 transition-all font-bold text-[1.5rem] tracking-widest text-[#2C2C2A] placeholder-[#8C847A]/30 backdrop-blur-sm"
+                placeholder="••••••••" 
+                disabled={loading}
+                required
+              />
             </div>
-          </motion.div>
-        </TiltCard>
-      </div>
+
+            <div className="pt-6">
+              <button 
+                type="submit" 
+                disabled={loading}
+                className="w-full relative group overflow-hidden bg-[#2C2C2A] text-white rounded-2xl px-5 py-5 flex items-center justify-between transition-all hover:bg-black hover:shadow-2xl hover:shadow-[#FFB5A7]/30"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-[#CDB4DB]/20 to-[#FFB5A7]/20 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <span className="relative z-10 font-bold tracking-wide">
+                   {loading ? "Generating node signature..." : "Establish Registry"}
+                </span>
+                {!loading && <ArrowRight className="relative z-10 w-5 h-5 group-hover:translate-x-1 transition-transform" />}
+              </button>
+            </div>
+          </form>
+
+          <p className="mt-8 text-center text-xs text-[#8C847A] font-bold tracking-widest uppercase relative z-10">
+             Already mapped?{' '}
+             <Link to="/login" className="text-[#2C2C2A] hover:text-[#CDB4DB] transition-colors ml-1 border-b border-[#2C2C2A]/20">Initialize Log In</Link>
+          </p>
+        </div>
+      </motion.div>
     </div>
   );
 }

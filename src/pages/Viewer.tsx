@@ -1,137 +1,120 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Download, Share2 } from 'lucide-react';
+import { ArrowLeft, Download, Share2, Globe, Lock, Box as BoxIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { ReactCompareSlider, ReactCompareSliderImage } from 'react-compare-slider';
-
-interface Project {
-  id: string;
-  name: string;
-  ownerName: string;
-  aiDesc: string;
-  originalUrl: string;
-  thumbnailUrl: string;
-}
+import { Canvas } from '@react-three/fiber';
+import { OrbitControls, Stage, Gltf } from '@react-three/drei';
+import { Storage, type Project } from '../lib/storage';
+import { TrueBlueprint3D } from '../components/ThreeDSequence';
 
 export function Viewer() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(true);
   const [project, setProject] = useState<Project | null>(null);
 
   useEffect(() => {
-    async function loadProject() {
-      try {
-        const puter = (window as any).puter || await import('@heyputer/puter.js').then(m => m.default || m);
-        const data = await puter.kv.get(`hously_${id}`);
-        if (data) {
-          setProject(data);
-        } else {
-          setProject({
-            id: id || "demo",
-            name: "Luminous Retreat",
-            ownerName: "Demo Workspace",
-            aiDesc: "A breathtaking architectural synthesis generated via neural spatial understanding. Light, white, and sublime geometry.",
-            originalUrl: "https://picsum.photos/seed/plan/800/600",
-            thumbnailUrl: "https://picsum.photos/seed/render/800/600"
-          });
-        }
-      } catch (e) {
-          setProject({
-            id: id || "demo",
-            name: "Luminous Retreat",
-            ownerName: "Demo Workspace",
-            aiDesc: "A breathtaking architectural synthesis generated via neural spatial understanding. Light, white, and sublime geometry.",
-            originalUrl: "https://picsum.photos/seed/plan/800/600",
-            thumbnailUrl: "https://picsum.photos/seed/render/800/600"
-          });
-      } finally {
-        setIsLoading(false);
-      }
+    if (id) {
+      const proj = Storage.getProject(id);
+      if (proj) setProject(proj);
     }
-    loadProject();
   }, [id]);
 
-  const handleDownload = () => {
-    if (!project) return;
-    const a = document.createElement('a');
-    a.href = project.thumbnailUrl;
-    a.download = `${project.name.replace(/\s+/g, '_')}_render.jpg`;
-    a.click();
-  };
-
-  if (isLoading) {
-    return (
-      <div className="flex flex-1 items-center justify-center">
-        <div className="h-10 w-10 animate-[spin_1.5s_linear_infinite] rounded-full border border-[#10b981]/40 border-t-[#10b981]"></div>
-      </div>
-    );
-  }
-
-  if (!project) {
-    return <div className="p-20 text-center text-[#064e3b]">Project not found</div>;
-  }
+  if (!project) return null;
 
   return (
-    <div className="w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8 mx-auto flex flex-col h-full flex-1 relative overflow-hidden">
-      <div className="orb-2" />
+    <div className="flex flex-col w-full min-h-screen bg-background overflow-hidden relative">
+      <div className="orb-1" />
       
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex items-center justify-between mb-8 z-10 relative"
-      >
-        <div className="flex items-center gap-4">
+      {/* Rareism Header */}
+      <header className="w-full flex items-center justify-between p-6 z-20 relative border-b border-border">
+        <div className="flex items-center gap-6">
           <button 
             onClick={() => navigate(-1)}
-            className="p-3 rounded-xl bg-white/60 hover:bg-[#10b981] transition-colors text-[#064e3b] hover:text-white shadow-sm"
+            className="p-3 rounded-xl hover:bg-[#F4F2EC] transition-colors"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="w-5 h-5 text-foreground" />
           </button>
           <div>
-            <h1 className="text-3xl font-extrabold text-[#022c22] tracking-tight">{project.name}</h1>
-            <p className="text-sm font-medium text-[#064e3b]/60 mt-1">by {project.ownerName}</p>
+            <h1 className="text-xl font-bold text-foreground flex items-center gap-3">
+              {project.name}
+              <span className={`text-[10px] px-2.5 py-1 rounded-full uppercase tracking-widest font-extrabold flex items-center gap-1 ${project.isPublic ? 'bg-primary/20 text-primary' : 'bg-foreground/5 text-foreground/50'}`}>
+                {project.isPublic ? <Globe className="w-3 h-3" /> : <Lock className="w-3 h-3" />}
+                {project.isPublic ? 'Public Node' : 'Encrypted'}
+              </span>
+            </h1>
+            <p className="text-xs font-bold text-foreground/50 tracking-widest uppercase mt-1">UUID: {project.id}</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <button
-            className="tactile-button-outline !px-4 !py-3"
-          >
-            <Share2 className="w-4 h-4" />
+        <div className="flex items-center gap-4">
+          <button className="tactile-button-outline !px-6 !py-3 !text-xs !bg-transparent border-0">
+            <Share2 className="w-4 h-4 mr-2" /> Publish
           </button>
-          <button
-            onClick={handleDownload}
-            className="tactile-button !px-6 !py-3"
-          >
-            <Download className="w-4 h-4 mr-2" />
-            Export High-Res
-          </button>
+          <a href={project.originalUrl} download={`${project.name}_blueprint.jpg`}>
+            <button className="tactile-button !px-6 !py-3 !text-xs">
+              <Download className="w-4 h-4 mr-2" /> Export
+            </button>
+          </a>
         </div>
-      </motion.div>
+      </header>
 
-      <motion.div 
-         initial={{ opacity: 0, scale: 0.98 }}
-         animate={{ opacity: 1, scale: 1 }}
-         transition={{ delay: 0.2, duration: 0.8 }}
-         className="flex-1 min-h-[60vh] rounded-[24px] overflow-hidden aether-card z-10"
-      >
-        <ReactCompareSlider
-          itemOne={<ReactCompareSliderImage src={project.originalUrl} alt="2D Plan" />}
-          itemTwo={<ReactCompareSliderImage src={project.thumbnailUrl} alt="3D Render" />}
-          className="w-full h-[70vh] object-cover"
-        />
-      </motion.div>
+      <main className="flex-1 flex flex-col lg:flex-row p-6 gap-6 z-10 relative">
+        {/* Source 2D Component */}
+        <motion.div 
+           initial={{ opacity: 0, x: -20 }}
+           animate={{ opacity: 1, x: 0 }}
+           transition={{ duration: 0.8, ease: "easeOut" }}
+           className="w-full lg:w-1/4 flex flex-col gap-6"
+        >
+          <div className="aether-card p-4 flex flex-col pt-6 aspect-[4/3] relative">
+            <h3 className="text-[10px] uppercase tracking-widest font-extrabold text-primary mb-3 px-2">Original Blueprints</h3>
+            <div className="flex-1 rounded-xl overflow-hidden bg-[#FAF9F6] border border-[#EAE6DF]">
+              <img src={project.originalUrl} alt="Source 2D Plan" className="w-full h-full object-cover opacity-60 mix-blend-multiply" />
+            </div>
+          </div>
+          
+          <div className="aether-card p-6 flex-1 flex flex-col gap-4">
+            <div>
+               <h3 className="text-[10px] uppercase tracking-widest font-extrabold text-primary mb-2">Model Geometry</h3>
+               <p className="text-sm text-foreground/80 font-medium">True GLTF Structural Form</p>
+            </div>
+            <div>
+               <h3 className="text-[10px] uppercase tracking-widest font-extrabold text-primary mb-2">Synthesis Context</h3>
+               <p className="text-xs text-foreground/60 leading-relaxed font-medium">{project.aiDesc}</p>
+            </div>
+          </div>
+        </motion.div>
 
-      <motion.div 
-         initial={{ opacity: 0, y: 20 }}
-         animate={{ opacity: 1, y: 0 }}
-         transition={{ delay: 0.4 }}
-         className="mt-8 p-8 bg-white/80 backdrop-blur-xl rounded-2xl aether-card max-w-3xl z-10"
-      >
-        <h3 className="text-xs font-bold text-[#10b981] mb-2 tracking-widest uppercase">Genesis Interpretation</h3>
-        <p className="text-[#064e3b] font-medium leading-relaxed">{project.aiDesc}</p>
-      </motion.div>
+        {/* Real Interactive 3D Component */}
+        <motion.div 
+           initial={{ opacity: 0, scale: 0.98 }}
+           animate={{ opacity: 1, scale: 1 }}
+           transition={{ delay: 0.2, duration: 0.8 }}
+           className="w-full lg:w-3/4 min-h-[60vh] rounded-[16px] overflow-hidden aether-card z-10 relative"
+        >
+          <div className="absolute top-6 left-6 z-10 pointer-events-none">
+             <div className="flex items-center gap-2 bg-white/60 backdrop-blur-md px-4 py-2 rounded-lg border border-[#EAE6DF] shadow-sm">
+                <BoxIcon className="w-4 h-4 text-foreground/80" />
+                <span className="text-[10px] uppercase tracking-widest font-bold text-foreground">Interactive 3D Simulation</span>
+             </div>
+          </div>
+          
+          <div className="absolute bottom-6 right-6 z-10 pointer-events-none text-right">
+             <p className="text-[10px] uppercase tracking-widest font-extrabold text-foreground/40 mb-1">Spatial Controls</p>
+             <p className="text-xs font-bold text-foreground/70 bg-white/50 backdrop-blur-md px-3 py-1.5 rounded-lg border border-[#EAE6DF]">Orbit [Drag] • Zoom [Scroll]</p>
+          </div>
+          
+          <Canvas shadows camera={{ position: [15, 15, 15], fov: 40 }} className="w-full h-full bg-[#FAF9F6] outline-none">
+            <Suspense fallback={null}>
+                  {/* Literal User-Uploaded Blueprint 2D-to-3D Extraction */}
+                  <ambientLight intensity={0.6} />
+                  <directionalLight position={[15, 25, 10]} intensity={2} castShadow shadow-bias={-0.0001} />
+                  <TrueBlueprint3D url={project.originalUrl} />
+                  <OrbitControls autoRotate autoRotateSpeed={1} makeDefault minDistance={8} maxDistance={60} maxPolarAngle={Math.PI / 2.2} />
+            </Suspense>
+          </Canvas>
+        </motion.div>
+      </main>
     </div>
   );
 }

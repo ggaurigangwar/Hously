@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthLayout } from './layouts/AuthLayout';
 import { Home } from './pages/Home';
 import { Preview } from './pages/Preview';
+import { Gallery } from './pages/Gallery';
 import { Upload } from './pages/Upload';
 import { Viewer } from './pages/Viewer';
 import { Pricing } from './pages/Pricing';
@@ -19,6 +20,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/preview" element={<Preview />} />
+          <Route path="/gallery" element={<Gallery />} />
           <Route path="/upload" element={<Upload />} />
           <Route path="/viewer/:id" element={<Viewer />} />
           <Route path="/pricing" element={<Pricing />} />

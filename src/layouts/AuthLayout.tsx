@@ -1,83 +1,64 @@
 import React, { useEffect, useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import { Navbar } from '../components/Navbar';
+import { Storage, type User } from '../lib/storage';
 
-interface PuterContextType {
+interface AuthContextType {
   isSignedIn: boolean;
-  user: any | null;
+  user: User | null;
+  signInLocally: (user: User) => void;
 }
 
 export function AuthLayout() {
   const [isSignedIn, setIsSignedIn] = useState(false);
-  const [user, setUser] = useState<any | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Wait for puter script to be available. (It should be global via npm import or script tag)
-    // Actually we installed @heyputer/puter.js via npm but we can access `puter` globally if imported, or import puter from '@heyputer/puter.js'.
-    const initAuth = async () => {
-      try {
-        const puter = (window as any).puter || await import('@heyputer/puter.js').then(m => m.default || m);
-        if (puter) {
-          const signedIn = puter.isSignedIn();
-          setIsSignedIn(signedIn);
-          if (signedIn) {
-            const userData = await puter.getUser();
-            setUser(userData);
-          }
-        }
-      } catch (err) {
-        console.error("Failed to initialize Puter auth:", err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    initAuth();
+    // Frictionless local auth bypass
+    const currentUser = Storage.getUser();
+    if (currentUser) {
+      setIsSignedIn(true);
+      setUser(currentUser);
+    }
+    setIsLoading(false);
   }, []);
 
-  const handleSignIn = async () => {
-    try {
-      const puter = (window as any).puter || await import('@heyputer/puter.js').then(m => m.default || m);
-      const signedIn = await puter.signIn();
-      if (signedIn) {
-        setIsSignedIn(true);
-        const userData = await puter.getUser();
-        setUser(userData);
-      }
-    } catch (err) {
-      console.error("Sign in failed", err);
-    }
+  const signInLocally = (userData: User) => {
+    Storage.setUser(userData);
+    setIsSignedIn(true);
+    setUser(userData);
   };
 
-  const handleSignOut = async () => {
-    try {
-      const puter = (window as any).puter || await import('@heyputer/puter.js').then(m => m.default || m);
-      puter.signOut();
-      setIsSignedIn(false);
-      setUser(null);
-    } catch (err) {
-      console.error("Sign out failed", err);
-    }
+  const handleSignOut = () => {
+    Storage.setUser(null);
+    setIsSignedIn(false);
+    setUser(null);
+    navigate('/');
   };
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#f2f7f4]">
+      <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
-          <div className="h-8 w-8 animate-[spin_1.5s_linear_infinite] rounded-full border border-[#10b981]/30 border-t-[#10b981]"></div>
-          <p className="text-xs text-[#064e3b]/60 font-mono tracking-widest uppercase font-bold">Initializing Workspace...</p>
+          <div className="h-8 w-8 animate-[spin_1.5s_linear_infinite] rounded-full border border-primary/30 border-t-primary"></div>
+          <p className="text-xs text-foreground/60 font-mono tracking-widest uppercase font-bold">Initializing Workspace...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#f2f7f4] text-[#064e3b]">
-      <Navbar isSignedIn={isSignedIn} user={user} onSignIn={handleSignIn} onSignOut={handleSignOut} />
+    <div className="flex min-h-screen flex-col bg-background text-foreground">
+      <Navbar 
+        isSignedIn={isSignedIn} 
+        user={user} 
+        onSignIn={() => navigate('/login')} 
+        onSignOut={handleSignOut} 
+      />
       <main className="flex-1 flex flex-col relative w-full items-center">
-        {/* We provide the auth context to all child routes */}
-        <Outlet context={{ isSignedIn, user } satisfies PuterContextType} />
+        <Outlet context={{ isSignedIn, user, signInLocally } satisfies AuthContextType} />
       </main>
     </div>
   );
