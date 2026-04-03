@@ -1,0 +1,81 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #4338ca;
+  --color-primary-foreground: #ffffff;
+  --color-background: #f8f9fa;
+  --color-foreground: #0f172a;
+  --color-border: #e2e8f0;
+}
+
+@layer base {
+  body {
+    /* Ultra-light minimal background using standard utility classes */
+    @apply bg-background text-foreground antialiased min-h-screen selection:bg-primary/20 selection:text-primary relative;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    letter-spacing: -0.02em;
+    overflow-x: hidden;
+  }
+
+  /* Extremely subtle, sophisticated noise overlay for tactile surface */
+  body::before {
+    content: "";
+    @apply fixed inset-0 pointer-events-none z-50 opacity-[0.015];
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  }
+
+  /* Floating Orbs for organic 3D continuous animation - Indigo hues */
+  .orb-1, .orb-2 {
+    @apply absolute rounded-full pointer-events-none mix-blend-multiply opacity-30;
+    transition: all 4s ease-in-out;
+  }
+  .orb-1 {
+    @apply bg-[#818cf8] w-[600px] h-[600px] blur-[120px] top-[-100px] left-[-200px];
+    animation: float1 20s infinite alternate cubic-bezier(0.5, 0, 0.5, 1);
+  }
+  .orb-2 {
+    @apply bg-[#a5b4fc] w-[400px] h-[400px] blur-[100px] bottom-[-50px] right-[-100px];
+    animation: float2 25s infinite alternate-reverse cubic-bezier(0.5, 0, 0.5, 1);
+  }
+
+  @keyframes float1 {
+    0% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(150px, 100px) scale(1.1); }
+    100% { transform: translate(-50px, 200px) scale(0.9); }
+  }
+
+  @keyframes float2 {
+    0% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(-150px, -150px) scale(1.2); }
+    100% { transform: translate(50px, -250px) scale(0.8); }
+  }
+
+  /* Frosted Glassmorphism for Light Mode */
+  .aether-glass {
+    @apply bg-background/70 backdrop-blur-3xl border border-border shadow-[0_20px_40px_rgba(67,56,202,0.04)];
+  }
+  
+  .aether-card {
+    /* Physical White card hovering effect */
+    @apply bg-white/90 border border-white rounded-[24px] shadow-[0_15px_35px_rgba(67,56,202,0.06),inset_0_4px_4px_rgba(255,255,255,1)];
+  }
+
+  .tactile-input {
+    /* Minimalist luxury light form inputs */
+    @apply bg-background border border-border rounded-xl shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] text-foreground focus:ring-4 focus:ring-primary/20 focus:border-primary/50 focus:bg-white transition-all outline-none px-5 py-4 placeholder-primary/40 font-medium;
+  }
+
+  .tactile-button {
+    /* Premium elegant solid indigo button */
+    @apply flex items-center justify-center rounded-xl bg-[#4338ca] bg-gradient-to-t from-[#3730a3] to-[#4f46e5] px-8 py-4 text-[15px] tracking-wide font-semibold text-white shadow-[0_10px_20px_rgba(67,56,202,0.2),inset_0_1px_0_rgba(255,255,255,0.2)] transition-all hover:-translate-y-0.5 hover:shadow-[0_15px_30px_rgba(67,56,202,0.3)] active:translate-y-0 active:shadow-[0_5px_10px_rgba(67,56,202,0.2)];
+  }
+
+  .tactile-button-outline {
+    /* Ghost button */
+    @apply flex items-center justify-center rounded-xl border-2 border-primary/20 bg-white px-8 py-4 text-[15px] tracking-wide font-semibold text-primary shadow-[0_4px_10px_rgba(0,0,0,0.02)] transition-all hover:bg-slate-50 hover:border-primary/40 hover:-translate-y-0.5 active:translate-y-0;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply tracking-tighter font-semibold text-foreground;
+  }
+}
