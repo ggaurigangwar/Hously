@@ -1,8 +1,6 @@
-import React, { useState, Suspense } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, Link, useOutletContext } from 'react-router-dom';
 import { ArrowRight, Box } from 'lucide-react';
-import { Canvas } from '@react-three/fiber';
-import { AuthBackground3D } from '../components/ThreeDSequence';
 import { motion } from 'framer-motion';
 
 export function Signup() {
@@ -26,15 +24,10 @@ export function Signup() {
   };
 
   return (
-    <div className="relative w-full min-h-screen bg-[#FAF9F6] overflow-hidden flex items-center justify-center">
-      {/* Immersive Pastel Architectural 3D Background */}
-      <div className="absolute inset-0 z-0 opacity-80 pointer-events-none mix-blend-multiply">
-        <Canvas camera={{ position: [5, 3, 5], fov: 40 }} gl={{ antialias: true }}>
-           <Suspense fallback={null}>
-             <AuthBackground3D />
-           </Suspense>
-        </Canvas>
-      </div>
+    <div className="relative w-full min-h-screen bg-[#FAF9F6] overflow-hidden flex items-center justify-center py-20">
+      {/* Rareism Ambient Glows */}
+      <div className="orb-1" />
+      <div className="orb-2" />
       
       {/* Background Graphic elements to enhance Vogue Magazine feel */}
       <div className="absolute bottom-12 right-12 md:bottom-24 md:right-24 z-10 pointer-events-none text-right">

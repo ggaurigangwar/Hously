@@ -1,6 +1,6 @@
-import React, { useRef, useMemo } from 'react';
+import { useRef, useMemo } from 'react';
 import { useFrame, useLoader } from '@react-three/fiber';
-import { Environment, ContactShadows } from '@react-three/drei';
+import { Environment, ContactShadows, Float } from '@react-three/drei';
 import * as THREE from 'three';
 
 // -------------------------------------------------------------
@@ -14,29 +14,18 @@ export function TrueBlueprint3D({ url }: { url: string }) {
   const imageAspect = texture.image ? texture.image.width / texture.image.height : 1;
   const baseSize = 25;
 
-  // The Convolutional Placement Simulator (Bypassing external ML parsing)
-  // Procedurally scatters architectural interior objects pretending to read semantic layout
   const densityObjects = useMemo(() => {
     return [
-      // Master Bedroom configuration
-      { type: 'bed', pos: [-6, 2.3, -6], scale: [2.5, 0.6, 2.5], material: 'fabric', color: '#E8E4D9' },
+      { type: 'bed', pos: [-6, 2.3, -6], scale: [2.5, 0.6, 2.5], material: 'fabric', color: '#B5AFA4' },
       { type: 'wardrobe', pos: [-8, 3, -6], scale: [0.8, 2.5, 3], material: 'wood', color: '#4A3728' },
       { type: 'rug', pos: [-6, 2.05, -5], scale: [4, 0.05, 3], material: 'fabric', color: '#D3CFC4' },
-      
-      // Living Area
-      { type: 'sofa_base', pos: [4, 2.3, 3], scale: [3.5, 0.5, 1.2], material: 'fabric', color: '#A09C96' },
-      { type: 'sofa_back', pos: [4, 2.6, 2.5], scale: [3.5, 0.6, 0.3], material: 'fabric', color: '#A09C96' },
+      { type: 'sofa_base', pos: [4, 2.3, 3], scale: [3.5, 0.5, 1.2], material: 'fabric', color: '#8C847A' },
+      { type: 'sofa_back', pos: [4, 2.6, 2.5], scale: [3.5, 0.6, 0.3], material: 'fabric', color: '#8C847A' },
       { type: 'tv_unit', pos: [4, 2.4, 7], scale: [4, 0.8, 0.5], material: 'wood', color: '#2C2A28' },
       { type: 'coffee_table', pos: [4, 2.2, 4.5], scale: [1.5, 0.3, 1.5], material: 'marble', color: '#FAF9F6' },
-      
-      // Kitchen & Dining
       { type: 'island', pos: [5, 2.5, -4], scale: [3, 1.2, 1.2], material: 'marble', color: '#FFFFFF' },
       { type: 'dining_table', pos: [0, 2.3, 4], scale: [2.5, 0.8, 1.5], material: 'wood', color: '#5C4033' },
-      
-      // Guest Room
       { type: 'bed_small', pos: [7, 2.3, -5], scale: [1.8, 0.5, 2], material: 'fabric', color: '#DCD8D0' },
-      
-      // Bathroom
       { type: 'tub', pos: [0, 2.2, -7], scale: [1.5, 0.4, 0.8], material: 'ceramic', color: '#FFFFFF' }
     ];
   }, []);
@@ -55,7 +44,6 @@ export function TrueBlueprint3D({ url }: { url: string }) {
         />
       </mesh>
 
-      {/* Semantic Density Overlays */}
       {densityObjects.map((obj, i) => {
         let mat;
         if (obj.material === 'wood') mat = <meshStandardMaterial color={obj.color} roughness={0.8} />;
@@ -79,167 +67,158 @@ export function TrueBlueprint3D({ url }: { url: string }) {
   );
 }
 
-// -------------------------------------------------------------
-// VUE 3: Auth Component Rotating Wireframe
-// -------------------------------------------------------------
-export function AuthBackground3D() {
-  const wireRef = useRef<THREE.Group>(null);
-  
-  useFrame((state) => {
-    if (wireRef.current) {
-      wireRef.current.rotation.y += 0.002;
-      wireRef.current.position.y = Math.sin(state.clock.elapsedTime * 0.5) * 0.2;
-    }
-  });
-
-  return (
-    <>
-      <ambientLight intensity={1} />
-      <directionalLight position={[10, 10, 5]} intensity={0.5} />
-      
-      <group ref={wireRef} position={[2, 0, 0]} scale={[1.8, 1.8, 1.8]}>
-        {/* Abstract Architectural Wireframe Shell */}
-        <mesh>
-          <boxGeometry args={[4, 2, 4]} />
-          <meshBasicMaterial color="#FFB5A7" wireframe transparent opacity={0.3} />
-        </mesh>
-        <mesh position={[0.5, 1.5, -0.5]}>
-          <boxGeometry args={[3, 1, 3]} />
-          <meshBasicMaterial color="#CDB4DB" wireframe transparent opacity={0.4} />
-        </mesh>
-        <mesh position={[-1, 0, 1]}>
-          <planeGeometry args={[6, 6]} />
-          <meshBasicMaterial color="#2C2C2A" wireframe transparent opacity={0.1} side={THREE.DoubleSide} />
-        </mesh>
-      </group>
-    </>
-  );
-}
-
-// -------------------------------------------------------------
-// VUE 2: The Hyper-Detailed Native Physical Villa Landing
-// -------------------------------------------------------------
-const generateHighPolyVilla = () => {
-  const blocks = [];
-  // Base / Pathway / Planters (Landscaping)
-  blocks.push({ pos: [0, -0.4, 0], scale: [22, 0.4, 18], material: 'concrete' });
-  blocks.push({ pos: [-8, -0.2, 6], scale: [4, 0.2, 4], material: 'concrete' });
-  blocks.push({ pos: [8, -0.2, 6], scale: [3, 0.6, 6], material: 'slate' });
-
-  // Main Volume (Raw Concrete)
-  blocks.push({ pos: [-2, 2.5, -2], scale: [12, 5, 8], material: 'concrete' });
-  
-  // Secondary Volume (Wood Paneling)
-  blocks.push({ pos: [6, 2.5, -1], scale: [6, 4, 6], material: 'wood' });
-  
-  // Entrance (Recessed Area)
-  blocks.push({ pos: [3, 1.5, 3], scale: [3, 3, 0.5], material: 'wood' });
-  
-  // Large Glass Windows (Indoor-Outdoor Connection)
-  blocks.push({ pos: [-4, 2.5, 2.1], scale: [6, 4, 0.2], material: 'glass' });
-  blocks.push({ pos: [6, 2.5, 2.1], scale: [4, 3, 0.2], material: 'glass' });
-  
-  // Flat Roofs (Sharp Rectangular Geometry)
-  blocks.push({ pos: [-2, 5.2, -2], scale: [13, 0.4, 9], material: 'slate' });
-  blocks.push({ pos: [6, 4.7, -1], scale: [7, 0.4, 7], material: 'slate' });
-  
-  // Minimalist Outdoor Plants/Geometry
-  blocks.push({ pos: [8, 0.4, 5], scale: [0.8, 1, 0.8], material: 'metal' });
-  blocks.push({ pos: [8, 0.6, 7], scale: [1.2, 1.5, 1.2], material: 'metal' });
-
-  return blocks;
-};
-
 export function RealisticArchitecturalLanding() {
-  const brickRef = useRef<THREE.Mesh>(null);
   const villaRef = useRef<THREE.Group>(null);
-  const blocks = useMemo(() => generateHighPolyVilla(), []);
+
+  // Procedural geometry nodes for the "Luxe" Villa
+  const volumes = useMemo(() => [
+    // Foundation & Site
+    { pos: [0, -0.3, 0], scale: [40, 0.6, 40], mat: 'concrete_dark' },
+    { pos: [0, 0.1, 8], scale: [6, 0.2, 12], mat: 'stone' }, // Entrance path
+    
+    // Ground Floor Main Volume
+    { pos: [-4, 2.3, -2], scale: [14, 4, 10], mat: 'concrete' },
+    { pos: [5, 2.3, -3], scale: [4, 4, 8], mat: 'wood' },
+    
+    // First Floor Cantilevered Volume
+    { pos: [0, 5.5, -4], scale: [16, 3, 10], mat: 'concrete' },
+    { pos: [-6, 5.5, 0], scale: [6, 3, 4], mat: 'wood_dark' },
+    
+    // Glass Walls (Floor-to-ceiling)
+    { pos: [-4, 2.5, 3.1], scale: [12, 3.8, 0.1], mat: 'glass' }, // Ground front
+    { pos: [0, 5.5, 1.1], scale: [10, 2.8, 0.1], mat: 'glass' }, // First front
+    { pos: [-9.1, 2.5, -2], scale: [0.1, 3.8, 6], mat: 'glass' }, // Side
+    
+    // Roof Planes
+    { pos: [0, 7.2, -4], scale: [18, 0.4, 12], mat: 'slate' },
+    { pos: [-4, 4.5, -2], scale: [15, 0.4, 11], mat: 'slate' },
+    
+    // Interior Detail (Visible through glass)
+    { pos: [-4, 1.5, -1], scale: [4, 0.8, 2.5], mat: 'leather' }, // Sofa
+    { pos: [2, 6, -3], scale: [1, 2, 0.1], mat: 'art' }, // Wall art
+  ], []);
 
   useFrame((state) => {
     const t = state.clock.getElapsedTime();
-    if (brickRef.current) {
-      if (t < 4) {
-        brickRef.current.rotation.y += 0.04;
-        brickRef.current.rotation.x = Math.sin(t * 3) * 0.2;
-        const squish = THREE.MathUtils.lerp(1, 0, t > 3 ? (t - 3) * 3 : 0);
-        brickRef.current.scale.set(squish, squish, squish);
-      } else {
-        brickRef.current.visible = false;
-      }
-    }
-    if (villaRef.current) {
-      villaRef.current.children.forEach((child, i) => {
-        const mesh = child as THREE.Mesh;
-        const delay = 3.5 + (i * 0.12); 
-        if (t > delay) {
-          const currentScale = mesh.scale.y;
-          const target = mesh.userData.targetScale;
-          const newS = THREE.MathUtils.lerp(currentScale, target, 0.06); 
-          mesh.scale.set(mesh.userData.targetScaleX, newS, mesh.userData.targetScaleZ);
-        } else {
-          mesh.scale.set(mesh.userData.targetScaleX, 0.001, mesh.userData.targetScaleZ);
-        }
-      });
-    }
-    const radius = 22;
-    state.camera.position.x = Math.sin(t * 0.15) * radius - 5;
-    state.camera.position.z = Math.cos(t * 0.15) * radius + 8;
-    state.camera.position.y = 8 + Math.sin(t * 0.3) * 3;
+    const radius = 26;
+    state.camera.position.x = Math.sin(t * 0.05) * radius;
+    state.camera.position.z = Math.cos(t * 0.05) * radius;
+    state.camera.position.y = 12 + Math.sin(t * 0.1) * 3;
     state.camera.lookAt(0, 2, 0);
+    
+    if (villaRef.current) {
+      villaRef.current.rotation.y = Math.sin(t * 0.02) * 0.03;
+    }
   });
 
   return (
     <>
-      <ambientLight intensity={0.5} />
-      <directionalLight position={[15, 20, 10]} intensity={1.8} castShadow shadow-mapSize={[2048, 2048]} shadow-bias={-0.0001} />
-      <spotLight position={[-15, 15, -15]} intensity={1.5} angle={0.4} penumbra={1} color="#FFB5A7" castShadow />
-      <pointLight position={[2, 6, 4]} intensity={0.6} color="#CDB4DB" />
-      <mesh ref={brickRef} position={[0, 4, 0]} castShadow>
-        <boxGeometry args={[1.5, 0.8, 3]} />
-        <meshStandardMaterial color="#8B4513" roughness={0.9} bumpScale={0.05} />
-      </mesh>
+      <ambientLight intensity={0.4} />
+      <directionalLight position={[20, 30, 20]} intensity={1.5} castShadow shadow-mapSize={[2048, 2048]} />
+      <spotLight position={[-15, 20, 10]} intensity={2500} angle={0.4} penumbra={1} color="#FFF5E6" castShadow />
+      <pointLight position={[0, 3, 0]} intensity={500} color="#FFD1A3" /> {/* Interior Glow */}
+      
       <group ref={villaRef}>
-        {blocks.map((b, i) => {
+        {volumes.map((v, i) => {
           let material;
-          switch (b.material) {
+          switch (v.mat) {
             case 'glass':
-               material = <meshPhysicalMaterial color="#E8F4F8" transmission={0.95} opacity={1} metalness={0.1} roughness={0} ior={1.52} thickness={0.5} />;
-               break;
-            case 'marble':
-               material = <meshStandardMaterial color="#FAF9F6" roughness={0.1} metalness={0.1} />;
-               break;
+                material = <meshPhysicalMaterial 
+                  color="#E8F4F8" 
+                  transmission={1} 
+                  thickness={1.5} 
+                  roughness={0.02} 
+                  ior={1.5} 
+                  transparent 
+                  opacity={0.4}
+                />;
+                break;
             case 'wood':
-               material = <meshStandardMaterial color="#5C4033" roughness={0.8} metalness={0.0} />;
-               break;
-            case 'slate':
-               material = <meshStandardMaterial color="#1C1C1A" roughness={0.8} metalness={0.3} />;
-               break;
-            case 'water':
-               material = <meshPhysicalMaterial color="#40E0D0" transmission={0.9} opacity={0.8} roughness={0.1} metalness={0.1} clearcoat={1} />;
-               break;
-            case 'metal':
-               material = <meshStandardMaterial color="#D3D3D3" roughness={0.2} metalness={0.8} />;
-               break;
+                material = <meshStandardMaterial color="#8C7E6A" roughness={0.7} metalness={0.1} />;
+                break;
+            case 'wood_dark':
+                material = <meshStandardMaterial color="#4A3728" roughness={0.8} />;
+                break;
             case 'concrete':
+                material = <meshStandardMaterial color="#FAF9F6" roughness={0.9} />;
+                break;
+            case 'concrete_dark':
+                material = <meshStandardMaterial color="#EAE6DF" roughness={1} />;
+                break;
+            case 'stone':
+                material = <meshStandardMaterial color="#D1CDBC" roughness={0.9} />;
+                break;
+            case 'slate':
+                material = <meshStandardMaterial color="#1C1C1A" roughness={0.8} metalness={0.3} />;
+                break;
+            case 'leather':
+                material = <meshStandardMaterial color="#5C4033" roughness={0.6} />;
+                break;
             default:
-               material = <meshStandardMaterial color="#E0DCD3" roughness={0.9} />;
+                material = <meshStandardMaterial color="#FFFFFF" />;
           }
           return (
-            <mesh 
-              key={i} 
-              position={[b.pos[0], b.pos[1], b.pos[2]]}
-              userData={{ targetScaleX: b.scale[0], targetScale: b.scale[1], targetScaleZ: b.scale[2] }}
-              scale={[b.scale[0], 0.001, b.scale[2]]}
-              castShadow receiveShadow
-            >
-              <boxGeometry args={[1, 1, 1]} />
+            <mesh key={i} position={v.pos as any} castShadow receiveShadow>
+              <boxGeometry args={v.scale as any} />
               {material}
             </mesh>
           );
         })}
       </group>
-      <ContactShadows resolution={2048} scale={60} blur={3} opacity={0.6} far={20} color="#1C1C1A" />
-      <Environment preset="apartment" />
+      
+      <ContactShadows resolution={1024} scale={60} blur={2.5} opacity={0.4} far={30} color="#1C1C1A" />
+      <Environment preset="city" />
     </>
   );
 }
+
+// -------------------------------------------------------------
+// VUE 4: The Studio Dashboard Hero (Interactive Floating Model)
+// -------------------------------------------------------------
+export function DashboardHero3D() {
+  const meshRef = useRef<THREE.Group>(null);
+  
+  useFrame((state) => {
+    if (meshRef.current) {
+      meshRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 0.3) * 0.15;
+      meshRef.current.position.y = Math.sin(state.clock.elapsedTime * 0.5) * 0.1;
+    }
+  });
+
+  return (
+    <Float speed={1.5} rotationIntensity={0.2} floatIntensity={0.5}>
+      <group ref={meshRef} scale={[0.45, 0.45, 0.45]}>
+        <mesh position={[0, 0, 0]} castShadow receiveShadow>
+          <boxGeometry args={[10, 0.2, 8]} />
+          <meshStandardMaterial color="#EAE6DF" roughness={0.9} />
+        </mesh>
+        <mesh position={[-2, 1.6, -1]} castShadow receiveShadow>
+          <boxGeometry args={[6, 3, 5]} />
+          <meshStandardMaterial color="#EAE6DF" roughness={0.9} />
+        </mesh>
+        <mesh position={[3, 1.1, 1]} castShadow receiveShadow>
+          <boxGeometry args={[4, 2, 4]} />
+          <meshStandardMaterial color="#8C7E6A" roughness={0.8} />
+        </mesh>
+        <mesh position={[-0.5, 3.2, -1]} castShadow receiveShadow>
+          <boxGeometry args={[7, 0.2, 6]} />
+          <meshStandardMaterial color="#1C1C1A" roughness={0.9} />
+        </mesh>
+        <mesh position={[3, 2.2, 1]} castShadow receiveShadow>
+          <boxGeometry args={[4.5, 0.2, 4.5]} />
+          <meshStandardMaterial color="#1C1C1A" roughness={0.9} />
+        </mesh>
+        <mesh position={[-2, 1.6, 1.6]} castShadow receiveShadow>
+          <boxGeometry args={[4, 2.8, 0.1]} />
+          <meshPhysicalMaterial color="#E8F4F8" transmission={1} opacity={1} roughness={0} thickness={1} transparent />
+        </mesh>
+        <mesh position={[1, -0.05, 5]} castShadow receiveShadow>
+          <boxGeometry args={[2, 0.01, 4]} />
+          <meshStandardMaterial color="#D1CDBC" roughness={1} />
+        </mesh>
+        <ContactShadows position={[0, -0.5, 0]} opacity={0.4} scale={20} blur={2.5} far={4} color="#1C1C1A" />
+      </group>
+    </Float>
+  );
+}
+

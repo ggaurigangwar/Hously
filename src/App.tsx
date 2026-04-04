@@ -6,7 +6,7 @@ import { Preview } from './pages/Preview';
 import { Gallery } from './pages/Gallery';
 import { Upload } from './pages/Upload';
 import { Viewer } from './pages/Viewer';
-import { Pricing } from './pages/Pricing';
+import { Contact } from './pages/Contact';
 import { Community } from './pages/Community';
 import { Login } from './pages/Login';
 import { Signup } from './pages/Signup';
@@ -23,7 +23,7 @@ function App() {
           <Route path="/gallery" element={<Gallery />} />
           <Route path="/upload" element={<Upload />} />
           <Route path="/viewer/:id" element={<Viewer />} />
-          <Route path="/pricing" element={<Pricing />} />
+          <Route path="/contact" element={<Contact />} />
           <Route path="/community" element={<Community />} />
         </Route>
       </Routes>
