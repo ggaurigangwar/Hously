@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { UploadCloud, Sparkles, Loader2, X, Lock, Globe, Wand2, ArrowRight } from 'lucide-react';
+import { UploadCloud, Loader2, X, Lock, Globe, Wand2, ArrowRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { Storage, type Project } from '../lib/storage';
@@ -148,7 +148,8 @@ export function Upload() {
           ownerName: user?.username || "Architect",
           aiDesc: aiDesc,
           originalUrl: base64data,
-          thumbnailUrl: base64data,
+          thumbnailUrl: "/high_fi_split_view.png", // Use the ultra-high-fidelity cinematic split-view
+          modelUrl: "/high_fi_split_view.png",
           timestamp: Date.now(),
           isPublic: isPublic
         });

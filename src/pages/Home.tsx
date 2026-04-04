@@ -33,8 +33,8 @@ export function Home() {
           </div>
           
           <h1 className="text-5xl md:text-8xl font-medium tracking-tighter text-[#2C2C2A] leading-[1.05] mb-8 drop-shadow-xl">
-            The Origin of <br />
-            <span className="text-[#A3A79A] italic font-normal">Structure.</span>
+            Minimalist Modern <br />
+            <span className="text-[#A3A79A] italic font-normal">Architecture.</span>
           </h1>
           
           <div className="flex flex-col md:flex-row items-start md:items-center gap-8 pointer-events-auto">
@@ -44,8 +44,8 @@ export function Home() {
                    <ArrowRight className="w-5 h-5 ml-4 group-hover:translate-x-1 transition-transform" />
                 </button>
              </Link>
-             <p className="max-w-xs text-[#2C2C2A]/70 text-sm leading-relaxed font-bold">
-               Witness the impossible. From identical 2D vectors transformed into true photorealistic 3D extraction.
+             <p className="max-w-md text-[#2C2C2A]/70 text-sm leading-relaxed font-bold">
+               A clean, modern minimalist style built on simplicity, geometry, and natural materials. Seamless indoor-outdoor connections, raw concrete, refined wood paneling, and sharp rectangular volumes.
              </p>
           </div>
         </motion.div>

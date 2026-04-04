@@ -121,21 +121,32 @@ export function AuthBackground3D() {
 // -------------------------------------------------------------
 const generateHighPolyVilla = () => {
   const blocks = [];
-  blocks.push({ pos: [0, -0.4, 0], scale: [20, 0.8, 16], material: 'concrete' });
-  blocks.push({ pos: [-5, -0.2, 5], scale: [8, 0.4, 4], material: 'water' });
-  blocks.push({ pos: [-5, 0, 5], scale: [8.4, 0.1, 4.4], material: 'concrete' });
-  blocks.push({ pos: [1, -0.1, 4], scale: [8, 0.2, 6], material: 'wood' });
-  blocks.push({ pos: [2, 2, -2], scale: [10, 4, 8], material: 'marble' });
-  blocks.push({ pos: [2, 2, 2.1], scale: [9.8, 3.8, 0.2], material: 'glass' });
-  blocks.push({ pos: [1, 4.2, 0], scale: [14, 0.4, 12], material: 'slate' });
-  blocks.push({ pos: [4, 6, -3], scale: [6, 3, 6], material: 'wood' });
-  blocks.push({ pos: [4, 6, 0.1], scale: [5.8, 2.8, 0.2], material: 'glass' });
-  blocks.push({ pos: [4, 7.7, -3], scale: [6.5, 0.3, 6.5], material: 'slate' });
-  blocks.push({ pos: [-5.5, 2, -5.5], scale: [0.6, 4, 0.6], material: 'slate' });
-  blocks.push({ pos: [-3, 2, 2], scale: [0.3, 4, 0.3], material: 'metal' });
-  blocks.push({ pos: [-8, 0.1, 0], scale: [2, 0.2, 3], material: 'wood' });
-  blocks.push({ pos: [-8.5, 0.4, 0], scale: [2, 0.2, 3], material: 'wood' });
-  blocks.push({ pos: [-9, 0.7, 0], scale: [2, 0.2, 3], material: 'wood' });
+  // Base / Pathway / Planters (Landscaping)
+  blocks.push({ pos: [0, -0.4, 0], scale: [22, 0.4, 18], material: 'concrete' });
+  blocks.push({ pos: [-8, -0.2, 6], scale: [4, 0.2, 4], material: 'concrete' });
+  blocks.push({ pos: [8, -0.2, 6], scale: [3, 0.6, 6], material: 'slate' });
+
+  // Main Volume (Raw Concrete)
+  blocks.push({ pos: [-2, 2.5, -2], scale: [12, 5, 8], material: 'concrete' });
+  
+  // Secondary Volume (Wood Paneling)
+  blocks.push({ pos: [6, 2.5, -1], scale: [6, 4, 6], material: 'wood' });
+  
+  // Entrance (Recessed Area)
+  blocks.push({ pos: [3, 1.5, 3], scale: [3, 3, 0.5], material: 'wood' });
+  
+  // Large Glass Windows (Indoor-Outdoor Connection)
+  blocks.push({ pos: [-4, 2.5, 2.1], scale: [6, 4, 0.2], material: 'glass' });
+  blocks.push({ pos: [6, 2.5, 2.1], scale: [4, 3, 0.2], material: 'glass' });
+  
+  // Flat Roofs (Sharp Rectangular Geometry)
+  blocks.push({ pos: [-2, 5.2, -2], scale: [13, 0.4, 9], material: 'slate' });
+  blocks.push({ pos: [6, 4.7, -1], scale: [7, 0.4, 7], material: 'slate' });
+  
+  // Minimalist Outdoor Plants/Geometry
+  blocks.push({ pos: [8, 0.4, 5], scale: [0.8, 1, 0.8], material: 'metal' });
+  blocks.push({ pos: [8, 0.6, 7], scale: [1.2, 1.5, 1.2], material: 'metal' });
+
   return blocks;
 };
 
