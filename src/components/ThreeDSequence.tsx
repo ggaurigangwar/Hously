@@ -70,32 +70,32 @@ export function TrueBlueprint3D({ url }: { url: string }) {
 export function RealisticArchitecturalLanding() {
   const villaRef = useRef<THREE.Group>(null);
 
-  // Procedural geometry nodes for the "Luxe" Villa
+  // Procedural geometry nodes for the "Luxe" Villa - Added small offsets (0.01) to prevent Z-fighting/blinking
   const volumes = useMemo(() => [
     // Foundation & Site
     { pos: [0, -0.3, 0], scale: [40, 0.6, 40], mat: 'concrete_dark' },
-    { pos: [0, 0.1, 8], scale: [6, 0.2, 12], mat: 'stone' }, // Entrance path
+    { pos: [0, 0.01, 8], scale: [6, 0.2, 12], mat: 'stone' }, 
     
     // Ground Floor Main Volume
     { pos: [-4, 2.3, -2], scale: [14, 4, 10], mat: 'concrete' },
-    { pos: [5, 2.3, -3], scale: [4, 4, 8], mat: 'wood' },
+    { pos: [5, 2.31, -3], scale: [4, 4, 8], mat: 'wood' },
     
     // First Floor Cantilevered Volume
     { pos: [0, 5.5, -4], scale: [16, 3, 10], mat: 'concrete' },
-    { pos: [-6, 5.5, 0], scale: [6, 3, 4], mat: 'wood_dark' },
+    { pos: [-6, 5.51, 0], scale: [6, 3, 4], mat: 'wood_dark' },
     
     // Glass Walls (Floor-to-ceiling)
-    { pos: [-4, 2.5, 3.1], scale: [12, 3.8, 0.1], mat: 'glass' }, // Ground front
-    { pos: [0, 5.5, 1.1], scale: [10, 2.8, 0.1], mat: 'glass' }, // First front
-    { pos: [-9.1, 2.5, -2], scale: [0.1, 3.8, 6], mat: 'glass' }, // Side
+    { pos: [-4, 2.5, 3.11], scale: [12, 3.8, 0.1], mat: 'glass' }, 
+    { pos: [0, 5.5, 1.11], scale: [10, 2.8, 0.1], mat: 'glass' },
+    { pos: [-9.11, 2.5, -2], scale: [0.1, 3.8, 6], mat: 'glass' },
     
     // Roof Planes
-    { pos: [0, 7.2, -4], scale: [18, 0.4, 12], mat: 'slate' },
-    { pos: [-4, 4.5, -2], scale: [15, 0.4, 11], mat: 'slate' },
+    { pos: [0, 7.21, -4], scale: [18, 0.4, 12], mat: 'slate' },
+    { pos: [-4, 4.51, -2], scale: [15, 0.4, 11], mat: 'slate' },
     
-    // Interior Detail (Visible through glass)
-    { pos: [-4, 1.5, -1], scale: [4, 0.8, 2.5], mat: 'leather' }, // Sofa
-    { pos: [2, 6, -3], scale: [1, 2, 0.1], mat: 'art' }, // Wall art
+    // Interior Detail
+    { pos: [-4, 1.51, -1], scale: [4, 0.8, 2.5], mat: 'leather' }, 
+    { pos: [2, 6.01, -3], scale: [1, 2, 0.1], mat: 'art' },
   ], []);
 
   useFrame((state) => {
@@ -113,10 +113,16 @@ export function RealisticArchitecturalLanding() {
 
   return (
     <>
-      <ambientLight intensity={0.4} />
-      <directionalLight position={[20, 30, 20]} intensity={1.5} castShadow shadow-mapSize={[2048, 2048]} />
-      <spotLight position={[-15, 20, 10]} intensity={2500} angle={0.4} penumbra={1} color="#FFF5E6" castShadow />
-      <pointLight position={[0, 3, 0]} intensity={500} color="#FFD1A3" /> {/* Interior Glow */}
+      <ambientLight intensity={0.5} />
+      {/* Consolidated lighting: Single high-quality directional light with shadow bias to fix flickering */}
+      <directionalLight 
+        position={[25, 45, 25]} 
+        intensity={2.2} 
+        castShadow 
+        shadow-mapSize={[1024, 1024]} 
+        shadow-bias={-0.0005} 
+      />
+      <pointLight position={[0, 4, 0]} intensity={150} color="#FFD1A3" /> {/* Interior Glow */}
       
       <group ref={villaRef}>
         {volumes.map((v, i) => {
@@ -166,7 +172,7 @@ export function RealisticArchitecturalLanding() {
         })}
       </group>
       
-      <ContactShadows resolution={1024} scale={60} blur={2.5} opacity={0.4} far={30} color="#1C1C1A" />
+      <ContactShadows resolution={512} scale={60} blur={2.5} opacity={0.4} far={30} color="#1C1C1A" />
       <Environment preset="city" />
     </>
   );

@@ -82,24 +82,20 @@ export function Gallery() {
                   <img 
                     src={proj.thumbnailUrl} 
                     alt={proj.name} 
-                    className="w-full h-full object-cover transition-all duration-1000 group-hover:scale-105 group-hover:opacity-90" 
+                    className="w-full h-full object-cover transition-all duration-1000 group-hover:scale-105" 
                   />
-                  
-                  {/* Immersive Depth Layers */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#FAF9F6] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-                  
-                  <div className="absolute inset-0 p-10 flex flex-col justify-end opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-8 group-hover:translate-y-0">
-                    <span className="text-[10px] font-extrabold tracking-[0.3em] uppercase text-primary mb-3">Structural Extraction</span>
-                    <h3 className="text-3xl font-medium text-foreground tracking-tight">{proj.name}</h3>
-                    <div className="flex items-center gap-4 mt-8">
-                       <div className="h-px flex-1 bg-primary/20" />
-                       <span className="text-[10px] font-bold text-primary/60">NODE: {proj.id.slice(-4)}</span>
-                    </div>
-                  </div>
                   
                   {/* Subtle Top Shine */}
                   <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 </motion.div>
+
+                <div className="mt-8 px-4 flex flex-col items-center">
+                   <h3 className="text-2xl font-bold tracking-tight text-foreground mb-1">{proj.name}</h3>
+                   <div className="flex items-center gap-3">
+                      <div className="w-1 h-1 rounded-full bg-primary" />
+                      <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#8C847A]">Structural Node: {proj.id.slice(-4)}</span>
+                   </div>
+                </div>
               </Link>
             </motion.div>
           ))

@@ -28,6 +28,19 @@ export function Signup() {
       {/* Rareism Ambient Glows */}
       <div className="orb-1" />
       <div className="orb-2" />
+
+      {/* Authentic Technical Blueprint Background */}
+      <div className="absolute inset-0 pointer-events-none opacity-[0.03]" 
+           style={{ 
+             backgroundImage: `
+               linear-gradient(#2C2C2A 1px, transparent 1px), 
+               linear-gradient(90deg, #2C2C2A 1px, transparent 1px),
+               linear-gradient(#2C2C2A 0.5px, transparent 0.5px), 
+               linear-gradient(90deg, #2C2C2A 0.5px, transparent 0.5px)
+             `,
+             backgroundSize: '100px 100px, 100px 100px, 20px 20px, 20px 20px'
+           }} 
+      />
       
       {/* Background Graphic elements to enhance Vogue Magazine feel */}
       <div className="absolute bottom-12 right-12 md:bottom-24 md:right-24 z-10 pointer-events-none text-right">

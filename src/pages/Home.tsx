@@ -1,5 +1,5 @@
-import { Suspense } from 'react';
-import { motion } from 'framer-motion';
+import { Suspense, useRef } from 'react';
+import { motion, useInView } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Compass, Home as HomeIcon, Maximize2 } from 'lucide-react';
 import { Canvas } from '@react-three/fiber';
@@ -36,6 +36,21 @@ const INSPIRATIONS = [
   }
 ];
 
+function SmartCanvas({ children, ...props }: any) {
+  const ref = useRef(null);
+  const isInView = useInView(ref, { amount: 0.1 });
+  
+  return (
+    <div ref={ref} className="w-full h-full">
+      {isInView && (
+        <Canvas {...props}>
+           {children}
+        </Canvas>
+      )}
+    </div>
+  );
+}
+
 export function Home() {
   return (
     <div className="relative w-full min-h-screen bg-[#FAF9F6]">
@@ -43,11 +58,11 @@ export function Home() {
       <div className="relative w-full h-screen overflow-hidden">
         {/* 4K Cinematic True 3D House Tour Background */}
         <div className="absolute inset-0 z-0 pointer-events-none">
-          <Canvas shadows dpr={[1, 2]} camera={{ position: [20, 20, 20], fov: 40 }} gl={{ alpha: true, antialias: true }}>
+          <SmartCanvas shadows dpr={[1, 1.5]} camera={{ position: [20, 20, 20], fov: 40 }} gl={{ alpha: true, antialias: true }}>
             <Suspense fallback={null}>
               <RealisticArchitecturalLanding />
             </Suspense>
-          </Canvas>
+          </SmartCanvas>
           {/* Subtle noise and glass overlay for Luxe feel */}
           <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] pointer-events-none" />
           <div className="absolute inset-0 bg-gradient-to-t from-[#FAF9F6] via-transparent to-transparent opacity-60" />

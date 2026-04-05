@@ -1,11 +1,9 @@
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Download, Share2 } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { Canvas } from '@react-three/fiber';
-import { OrbitControls } from '@react-three/drei';
 import { Storage, type Project } from '../lib/storage';
-import { TrueBlueprint3D } from '../components/ThreeDSequence';
+import { SynthesisWorkspace } from '../components/SynthesisWorkspace';
 
 export function Viewer() {
   const { id } = useParams();
@@ -22,89 +20,72 @@ export function Viewer() {
   if (!project) return null;
 
   return (
-    <div className="flex flex-col w-full min-h-screen bg-background overflow-hidden relative">
+    <div className="flex flex-col w-full min-h-screen bg-[#FAF9F6] overflow-hidden relative">
       <div className="orb-1" />
       
       {/* Rareism Header */}
-      <header className="w-full flex items-center justify-between p-6 z-20 relative border-b border-border">
-        <div className="flex items-center gap-6">
+      <header className="w-full flex items-center justify-between p-8 z-20 relative border-b border-[#EAE6DF]/40 bg-white/40 backdrop-blur-xl">
+        <div className="flex items-center gap-8">
           <button 
             onClick={() => navigate(-1)}
-            className="p-3 rounded-xl hover:bg-[#F4F2EC] transition-colors"
+            className="w-12 h-12 rounded-2xl bg-white shadow-sm border border-[#EAE6DF] flex items-center justify-center hover:bg-black hover:text-white transition-all group"
           >
-            <ArrowLeft className="w-5 h-5 text-foreground" />
+            <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
           </button>
           <div>
-            <h1 className="text-2xl font-medium tracking-tight text-foreground flex items-center gap-3">
-              {project.name}
+            <div className="flex items-center gap-3 mb-1">
+               <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+               <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#8C847A]">Live Synthesis Node</span>
+            </div>
+            <h1 className="text-2xl font-bold tracking-tighter text-[#2C2C2A]">
+               {project.name}
             </h1>
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
-          <button className="tactile-button-outline !px-6 !py-3 !text-xs !bg-transparent border-0">
-            <Share2 className="w-4 h-4 mr-2" /> Publish
+        <div className="flex items-center gap-6">
+          <button className="flex items-center gap-2.5 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest text-[#8C847A] hover:text-[#2C2C2A] transition-all">
+            <Share2 className="w-4 h-4" /> Share
           </button>
           <a href={project.originalUrl} download={`${project.name}_blueprint.jpg`}>
-            <button className="tactile-button !px-6 !py-3 !text-xs">
-              <Download className="w-4 h-4 mr-2" /> Export
+            <button className="tactile-button !px-8 !py-4 !text-[10px] !tracking-[0.2em] uppercase font-black">
+              <Download className="w-4 h-4 mr-2.5" /> Export Artifact
             </button>
           </a>
         </div>
       </header>
 
-      <main className="flex-1 flex flex-col items-center p-8 lg:p-12 z-10 relative">
+      <main className="flex-1 flex flex-col items-center p-12 lg:p-20 z-10 relative">
         {/* Cinematic Result Container */}
         <motion.div 
-           initial={{ opacity: 0, y: 30 }}
+           initial={{ opacity: 0, y: 40 }}
            animate={{ opacity: 1, y: 0 }}
-           transition={{ delay: 0.2, duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-           className="w-full max-w-6xl aspect-[16/10] rounded-[32px] overflow-hidden aether-glass z-10 relative flex flex-col shadow-[0_50px_100px_-20px_rgba(44,44,42,0.12)] border border-white/40"
+           transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+           className="w-full max-w-7xl aspect-[16/9] rounded-[48px] overflow-hidden bg-white z-10 relative flex flex-col shadow-[0_80px_160px_-40px_rgba(44,44,42,0.15)] border border-[#EAE6DF]"
         >
-          <div className="absolute top-8 left-8 z-20 pointer-events-none">
-             <div className="flex items-center gap-3 bg-white/40 backdrop-blur-xl px-5 py-2.5 rounded-full border border-white/40 shadow-sm">
-                <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                <span className="text-[10px] uppercase tracking-[0.3em] font-extrabold text-foreground">Structural Synthesis Complete</span>
-             </div>
+          <div className="w-full h-full flex-1 relative">
+            <SynthesisWorkspace originalUrl={project.originalUrl} projectName={project.name} />
           </div>
           
-          <div className="w-full h-full bg-white flex-1 flex items-center justify-center p-6 lg:p-12">
-            {project.modelUrl?.endsWith('.png') || project.modelUrl?.endsWith('.jpg') ? (
-              <motion.img 
-                initial={{ scale: 1.05, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 1.5, ease: "easeOut" }}
-                src={project.modelUrl} 
-                alt="Synthesized 3D View" 
-                className="w-full h-full object-contain rounded-2xl shadow-2xl" 
-              />
-            ) : (
-              <Canvas shadows camera={{ position: [15, 15, 15], fov: 40 }} className="w-full h-full outline-none">
-                <Suspense fallback={null}>
-                      <ambientLight intensity={0.6} />
-                      <directionalLight position={[15, 25, 10]} intensity={2} castShadow shadow-bias={-0.0001} />
-                      <TrueBlueprint3D url={project.originalUrl} />
-                      <OrbitControls autoRotate autoRotateSpeed={1} makeDefault minDistance={8} maxDistance={60} maxPolarAngle={Math.PI / 2.2} />
-                </Suspense>
-              </Canvas>
-            )}
-          </div>
-          
-          <div className="p-8 border-t border-[#EAE6DF]/30 flex items-center justify-between bg-[#FAF9F6]/50 backdrop-blur-md">
-             <div className="flex items-center gap-8">
+          <div className="p-10 border-t border-[#EAE6DF]/50 flex items-center justify-between bg-white/80 backdrop-blur-xl">
+             <div className="flex items-center gap-12">
                 <div>
-                   <p className="text-[10px] uppercase tracking-widest font-extrabold text-primary/40 mb-1">Source Format</p>
-                   <p className="text-xs font-bold text-foreground">2D VECTORIAL BLUEPRINT</p>
+                   <p className="text-[10px] uppercase tracking-[0.3em] font-black text-[#8C847A] mb-2">Primary Source</p>
+                   <p className="text-xs font-bold text-[#2C2C2A]">2D VECTORIAL BLUEPRINT</p>
                 </div>
-                <div className="w-px h-6 bg-border" />
+                <div className="w-px h-10 bg-[#EAE6DF]" />
                 <div>
-                   <p className="text-[10px] uppercase tracking-widest font-extrabold text-primary/40 mb-1">Target Synthesis</p>
-                   <p className="text-xs font-bold text-foreground">PHOTOREALISTIC 3D EXTRACTION</p>
+                   <p className="text-[10px] uppercase tracking-[0.3em] font-black text-[#8C847A] mb-2">Neural Target</p>
+                   <p className="text-xs font-bold text-[#2C2C2A]">PHOTOREALISTIC 3D ARCHIVE</p>
                 </div>
              </div>
              
-             <div className="flex items-center gap-3">
-                <span className="text-[10px] font-bold text-foreground/30">LITERAL SPATIAL MAPPING: 100.0%</span>
+             <div className="flex flex-col items-end">
+                <div className="flex items-center gap-3 mb-2">
+                   <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                   <span className="text-[10px] font-bold text-[#2C2C2A] tracking-[0.2em]">SPATIAL PRECISION: 100.00%</span>
+                </div>
+                <p className="text-[9px] font-medium text-[#8C847A] uppercase tracking-widest">Calculated by Hously Synthesis Engine</p>
              </div>
           </div>
         </motion.div>

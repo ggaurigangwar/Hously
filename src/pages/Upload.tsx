@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { UploadCloud, Loader2, X, Lock, Globe, ArrowRight, Zap, Database, Terminal, ShieldCheck, Activity } from 'lucide-react';
+import { UploadCloud, X, Lock, Globe, ArrowRight, Database, Terminal, ShieldCheck, Activity } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { Storage } from '../lib/storage';
@@ -46,16 +46,18 @@ export function Upload() {
     try {
       const interval = setInterval(() => {
         setProgress(p => {
-          if (p < 30) { setStatusText("Extracting geometric vectors..."); return p + 5; }
-          if (p < 60) { setStatusText("Neural synthesis initiated..."); return p + 3; }
-          if (p < 90) { setStatusText("Baking physical materials..."); return p + 2; }
+          if (p < 20) { setStatusText("Stripping text, labels, and dimensions from source..."); return p + 5; }
+          if (p < 40) { setStatusText("Aligning walls and openings with geometric precision..."); return p + 4; }
+          if (p < 60) { setStatusText("Baking realistic materials and neutral lighting..."); return p + 3; }
+          if (p < 80) { setStatusText("Injecting semantic furniture nodes (Sofa, Bed, Table)..."); return p + 2; }
+          if (p < 95) { setStatusText("Finalizing high-fidelity 3D architectural export..."); return p + 1; }
           return p;
         });
-      }, 250);
+      }, 200);
 
-      const aiDesc = "Advanced geometric synthesis reconstructing structural nodes into a photorealistic architectural construct.";
+      const aiDesc = "Photorealistic top-down architectural synthesis. Protocol: 1. Remove all text, letters, numbers, labels, or dimensions. 2. Maintain exact lines and positions for walls, rooms, doors, and windows without shifting/resizing. 3. Ensure crisp edges, balanced neutral lighting, and realistic materials. 4. Add realistic furniture (beds, sofas, tables) where indicated in the original sketch.";
       
-      await new Promise(r => setTimeout(r, 3500));
+      await new Promise(r => setTimeout(r, 4500));
       clearInterval(interval);
       setProgress(100);
       setStatusText("Finalizing secure WebGL export...");
