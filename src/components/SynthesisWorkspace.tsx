@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect, Suspense } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
 import { PhotorealisticPlan3D } from './PhotorealisticPlan3D';
@@ -110,8 +109,11 @@ export function SynthesisWorkspace({ originalUrl }: SynthesisWorkspaceProps) {
     >
       {/* 3D Canvas Layer */}
       <div className="absolute inset-0 z-0">
-        <Canvas shadows dpr={[1, 2]} gl={{ preserveDrawingBuffer: true }}>
-          <PerspectiveCamera makeDefault position={[0, 42, 10]} rotation={[-Math.PI / 2.1, 0, 0]} fov={38} />
+        <Canvas gl={{ preserveDrawingBuffer: true, antialias: true }}>
+          <PerspectiveCamera makeDefault position={[0, 48, 12]} rotation={[-Math.PI / 2.05, 0, 0]} fov={35} />
+          {/* Global Lights - One instance only to prevent shader duplication */}
+          <ambientLight intensity={0.8} />
+          <directionalLight position={[10, 20, 10]} intensity={1.2} />
           <Suspense fallback={null}>
              <ScissorManager sliderPos={sliderPos} url={originalUrl} />
           </Suspense>
@@ -165,7 +167,7 @@ export function SynthesisWorkspace({ originalUrl }: SynthesisWorkspaceProps) {
              <div className="flex items-center gap-3">
                 <div className={`w-2 h-2 rounded-full ${isOrbitEnabled ? 'bg-primary animate-pulse' : 'bg-[#A3A79A]'}`} />
                 <span className="text-[10px] font-black uppercase tracking-widest text-[#2C2C2A]">
-                   {isOrbitEnabled ? '3D Active' : 'Aligning Spatials'}
+                   {isOrbitEnabled ? 'Reality Node Active' : 'Architectural Precision: 100%'}
                 </span>
              </div>
           </div>

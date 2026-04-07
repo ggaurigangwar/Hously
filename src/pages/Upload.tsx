@@ -1,9 +1,16 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { UploadCloud, X, Lock, Globe, ArrowRight, Database, Terminal, ShieldCheck, Activity } from 'lucide-react';
+import { UploadCloud, X, Lock, Globe, ArrowRight, ShieldCheck, Activity } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { Storage } from '../lib/storage';
+
+const VILLA_IMAGES = [
+  "https://images.unsplash.com/photo-1622015663381-d2e05ae91b72?auto=format&w=2000",
+  "https://images.unsplash.com/photo-1622015663319-e97e697503ee?auto=format&w=2000",
+  "https://images.unsplash.com/photo-1767950470198-c9cd97f8ed87?auto=format&w=2000",
+  "https://images.unsplash.com/photo-1513584684374-8bab748fbf90?auto=format&w=2000"
+];
 
 export function Upload() {
   const [file, setFile] = useState<File | null>(null);
@@ -14,6 +21,14 @@ export function Upload() {
   const [isPublic, setIsPublic] = useState(false);
   const navigate = useNavigate();
   const { user } = useOutletContext<any>();
+  const [currentImage, setCurrentImage] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentImage(prev => (prev + 1) % VILLA_IMAGES.length);
+    }, 6000);
+    return () => clearInterval(timer);
+  }, []);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const selected = acceptedFiles[0];
@@ -74,8 +89,8 @@ export function Upload() {
           ownerName: user?.username || "Architect",
           aiDesc: aiDesc,
           originalUrl: base64data,
-          thumbnailUrl: "https://images.unsplash.com/photo-1600607687920-4e2a09be1587?auto=format&fit=crop&q=80&w=800",
-          modelUrl: "https://vazxmixizkinqawvyrvn.supabase.co/storage/v1/object/public/models/house-2/model.gltf",
+          thumbnailUrl: base64data, // Use the actual 2D plan as a thumbnail
+          modelUrl: "none", // Reset for procedural synthesis
           timestamp: Date.now(),
           isPublic: isPublic
         });
@@ -197,32 +212,32 @@ export function Upload() {
         </motion.div>
       </div>
 
-      {/* Right Column: High-Standard Static Composition */}
+      {/* Right Column: High-Standard Architectural Playback */}
       <div className="w-full lg:w-[55%] relative flex items-center justify-center bg-white overflow-hidden">
-        {/* Background photorealistic render - STATIONARY and Elegant */}
-        <div className="absolute inset-0 z-0">
-           <img 
-            src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=2000" 
-            className="w-full h-full object-cover opacity-80" 
-            alt="Architectural Composition"
-           />
-           <div className="absolute inset-0 bg-white/40" />
-           {/* Geometric Overlay */}
-           <div className="absolute inset-0 grid grid-cols-12 grid-rows-12 opacity-10">
-              {Array.from({length: 144}).map((_, i) => <div key={i} className="border-[0.5px] border-[#2C2C2A]" />)}
-           </div>
+        {/* Background photorealistic image sequence */}
+        <div className="absolute inset-0 z-0 bg-[#F4F2EC]">
+           <AnimatePresence mode="wait">
+             <motion.img 
+               key={VILLA_IMAGES[currentImage]}
+               src={VILLA_IMAGES[currentImage]}
+               initial={{ opacity: 0, scale: 1.1 }}
+               animate={{ opacity: 1, scale: 1 }}
+               exit={{ opacity: 0, scale: 1.05 }}
+               transition={{ duration: 2, ease: "easeInOut" }}
+               className="w-full h-full object-cover"
+               alt={`Modernist Luxury Architecture - Sequence ${currentImage + 1}`}
+               onError={() => setCurrentImage(prev => (prev + 1) % VILLA_IMAGES.length)}
+             />
+           </AnimatePresence>
+           {/* Subtle gradient overlay to ensure text readability if needed */}
+           <div className="absolute inset-0 bg-gradient-to-t from-[#FAF9F6] via-transparent to-transparent opacity-20" />
         </div>
 
         {/* Informational Panel */}
         <div className="relative z-10 w-full h-full p-20 flex flex-col justify-between pointer-events-none">
            <div className="flex justify-between items-start">
-              <div className="space-y-2">
-                 <div className="flex items-center gap-3">
-                    <Database className="w-4 h-4 text-[#2C2C2A]/40" />
-                    <span className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#2C2C2A]/40">Active Vector Node</span>
-                 </div>
-                 <p className="text-[#2C2C2A] font-bold text-lg tracking-tight">Hously_Precision_Cache.ENV</p>
-              </div>
+              <div className="space-y-2" />
+
               <div className="text-right">
                  <p className="text-[10px] font-black uppercase tracking-widest text-primary mb-1 tracking-[0.4em]">Ready</p>
                  <div className="w-12 h-0.5 bg-primary/20 ml-auto" />
@@ -230,27 +245,7 @@ export function Upload() {
            </div>
 
            <div className="flex flex-col items-end gap-10">
-              {/* Technical Diagnostics */}
-              <div className="p-10 border border-[#EAE6DF] rounded-[40px] bg-white/20 backdrop-blur-2xl max-w-sm w-full">
-                 <div className="flex items-center gap-3 mb-8">
-                    <Terminal className="w-4 h-4 text-[#2C2C2A]" />
-                    <h3 className="text-xs font-black uppercase tracking-[0.2em] text-[#2C2C2A]">Diagnostic Live Feed</h3>
-                 </div>
-                 <div className="space-y-4 font-mono text-[11px] font-bold tracking-tight text-[#2C2C2A]/60">
-                    <div className="flex justify-between">
-                       <span>Engine Synthesis</span>
-                       <span className="text-primary italic animate-pulse">Online</span>
-                    </div>
-                    <div className="flex justify-between border-t border-[#EAE6DF] pt-4">
-                       <span>Latency Cycle</span>
-                       <span>0.02ms</span>
-                    </div>
-                    <div className="flex justify-between border-t border-[#EAE6DF] pt-4">
-                       <span>Geometry Buffer</span>
-                       <span>Locked_8K</span>
-                    </div>
-                 </div>
-              </div>
+
               
               <div className="flex flex-col items-end">
                  <p className="text-[300px] font-black text-[#2C2C2A]/[0.03] leading-[0.7] -mr-10 select-none">H</p>
