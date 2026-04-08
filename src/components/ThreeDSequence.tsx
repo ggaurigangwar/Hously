@@ -4,7 +4,7 @@ import { Environment, ContactShadows, Float } from '@react-three/drei';
 import * as THREE from 'three';
 
 // -------------------------------------------------------------
-// VUE 1: The Literal 2D to 3D Blueprint Extrusion with Semantic Density Simulation
+// VUE 1: The Literal 2D to 3D Blueprint Extrusion
 // -------------------------------------------------------------
 export function TrueBlueprint3D({ url }: { url: string }) {
   const texture = useLoader(THREE.TextureLoader, url);
@@ -70,32 +70,39 @@ export function TrueBlueprint3D({ url }: { url: string }) {
 export function RealisticArchitecturalLanding() {
   const villaRef = useRef<THREE.Group>(null);
 
-  // Procedural geometry nodes for the "Luxe" Villa - Added small offsets (0.01) to prevent Z-fighting/blinking
+  // Structural nodes - Stable, photorealistic offsets
   const volumes = useMemo(() => [
-    // Foundation & Site
-    { pos: [0, -0.3, 0], scale: [40, 0.6, 40], mat: 'concrete_dark' },
-    { pos: [0, 0.01, 8], scale: [6, 0.2, 12], mat: 'stone' }, 
+    // Foundation & Site (Stable top at 0.02)
+    { pos: [0, -0.28, 0], scale: [40, 0.6, 40], mat: 'concrete_dark' },
+    { pos: [0.5, 0.07, 10], scale: [8, 0.2, 14], mat: 'stone' }, // Shifted from zero
     
-    // Ground Floor Main Volume
-    { pos: [-4, 2.3, -2], scale: [14, 4, 10], mat: 'concrete' },
-    { pos: [5, 2.31, -3], scale: [4, 4, 8], mat: 'wood' },
+    // Reflective Entry Element (Realism detail)
+    { pos: [8, 0.015, 2], scale: [10, 0.05, 12], mat: 'water' },
     
-    // First Floor Cantilevered Volume
-    { pos: [0, 5.5, -4], scale: [16, 3, 10], mat: 'concrete' },
-    { pos: [-6, 5.51, 0], scale: [6, 3, 4], mat: 'wood_dark' },
+    // Ground Floor Main Volume (Top at 4.25)
+    { pos: [-4, 2.15, -2], scale: [14, 4.2, 10], mat: 'concrete' },
+    { pos: [5, 2.15, -3], scale: [4, 4.2, 8], mat: 'wood' },
     
-    // Glass Walls (Floor-to-ceiling)
-    { pos: [-4, 2.5, 3.11], scale: [12, 3.8, 0.1], mat: 'glass' }, 
-    { pos: [0, 5.5, 1.11], scale: [10, 2.8, 0.1], mat: 'glass' },
-    { pos: [-9.11, 2.5, -2], scale: [0.1, 3.8, 6], mat: 'glass' },
+    // First Floor Cantilevered Volume (Bottom at 4.35)
+    { pos: [0, 5.85, -4], scale: [16, 3, 10], mat: 'concrete' },
+    { pos: [-6, 5.85, 0], scale: [6, 3, 4], mat: 'wood_dark' },
     
-    // Roof Planes
-    { pos: [0, 7.21, -4], scale: [18, 0.4, 12], mat: 'slate' },
-    { pos: [-4, 4.51, -2], scale: [15, 0.4, 11], mat: 'slate' },
+    // Glass Walls (Floor-to-ceiling) - Inset from frames
+    { pos: [-4, 2.52, 3.25], scale: [12, 3.8, 0.1], mat: 'glass' }, 
+    { pos: [0, 5.85, 1.25], scale: [10, 2.8, 0.1], mat: 'glass' },
+    { pos: [-9.3, 2.52, -2], scale: [0.1, 3.8, 6], mat: 'glass' },
     
-    // Interior Detail
-    { pos: [-4, 1.51, -1], scale: [4, 0.8, 2.5], mat: 'leather' }, 
-    { pos: [2, 6.01, -3], scale: [1, 2, 0.1], mat: 'art' },
+    // Roof Planes - Clear separation
+    { pos: [0, 7.5, -4], scale: [18, 0.4, 12], mat: 'slate' },
+    { pos: [-4, 4.75, -2], scale: [15, 0.4, 11], mat: 'slate' },
+    
+    // Modern Interior Accents
+    { pos: [-4, 1.57, -1], scale: [3, 0.8, 2], mat: 'leather' }, 
+    { pos: [2, 6.07, -3], scale: [1, 2, 0.05], mat: 'art' },
+    
+    // Light Strips (Ceiling accent)
+    { pos: [-4, 4.2, 2.5], scale: [10, 0.02, 0.02], mat: 'emissive' },
+    { pos: [4, 4.2, -1], scale: [0.02, 0.02, 6], mat: 'emissive' },
   ], []);
 
   useFrame((state) => {
@@ -103,41 +110,32 @@ export function RealisticArchitecturalLanding() {
     const radius = 26;
     state.camera.position.x = Math.sin(t * 0.05) * radius;
     state.camera.position.z = Math.cos(t * 0.05) * radius;
-    state.camera.position.y = 12 + Math.sin(t * 0.1) * 3;
+    state.camera.position.y = 11 + Math.sin(t * 0.08) * 2.5; // Slightly lower camera for dominance
     state.camera.lookAt(0, 2, 0);
     
     if (villaRef.current) {
-      villaRef.current.rotation.y = Math.sin(t * 0.02) * 0.03;
+      villaRef.current.rotation.y = Math.sin(t * 0.02) * 0.02;
     }
   });
 
   return (
     <>
       <ambientLight intensity={0.5} />
-      {/* Consolidated lighting: Single high-quality directional light with shadow bias to fix flickering */}
       <directionalLight 
         position={[25, 45, 25]} 
-        intensity={2.2} 
+        intensity={3.2} 
         castShadow 
-        shadow-mapSize={[1024, 1024]} 
-        shadow-bias={-0.0005} 
+        shadow-mapSize={[2048, 2048]} 
+        shadow-bias={-0.001} // Slightly more bias for crisp concrete shadows
       />
-      <pointLight position={[0, 4, 0]} intensity={150} color="#FFD1A3" /> {/* Interior Glow */}
+      <pointLight position={[0, 4, 0]} intensity={180} color="#FFD1A3" />
       
       <group ref={villaRef}>
         {volumes.map((v, i) => {
           let material;
           switch (v.mat) {
             case 'glass':
-                material = <meshPhysicalMaterial 
-                  color="#E8F4F8" 
-                  transmission={1} 
-                  thickness={1.5} 
-                  roughness={0.02} 
-                  ior={1.5} 
-                  transparent 
-                  opacity={0.4}
-                />;
+                material = <meshPhysicalMaterial color="#E8F4F8" transmission={1} thickness={1} roughness={0} ior={1.5} transparent opacity={0.3} clearcoat={1} />;
                 break;
             case 'wood':
                 material = <meshStandardMaterial color="#8C7E6A" roughness={0.7} metalness={0.1} />;
@@ -146,19 +144,25 @@ export function RealisticArchitecturalLanding() {
                 material = <meshStandardMaterial color="#4A3728" roughness={0.8} />;
                 break;
             case 'concrete':
-                material = <meshStandardMaterial color="#FAF9F6" roughness={0.9} />;
+                material = <meshStandardMaterial color="#FAF9F6" roughness={0.8} />;
                 break;
             case 'concrete_dark':
-                material = <meshStandardMaterial color="#EAE6DF" roughness={1} />;
+                material = <meshStandardMaterial color="#EAE6DF" roughness={0.9} />;
                 break;
             case 'stone':
                 material = <meshStandardMaterial color="#D1CDBC" roughness={0.9} />;
                 break;
             case 'slate':
-                material = <meshStandardMaterial color="#1C1C1A" roughness={0.8} metalness={0.3} />;
+                material = <meshStandardMaterial color="#1C1C1A" roughness={0.6} metalness={0.4} />;
                 break;
             case 'leather':
-                material = <meshStandardMaterial color="#5C4033" roughness={0.6} />;
+                material = <meshStandardMaterial color="#5C4033" roughness={0.8} />;
+                break;
+            case 'water':
+                material = <meshPhysicalMaterial color="#A8C3CE" transmission={0.4} roughness={0} metalness={0.6} clearcoat={1} />;
+                break;
+            case 'emissive':
+                material = <meshStandardMaterial color="#FFFFFF" emissive="#FFD1A3" emissiveIntensity={4} />;
                 break;
             default:
                 material = <meshStandardMaterial color="#FFFFFF" />;
@@ -172,7 +176,7 @@ export function RealisticArchitecturalLanding() {
         })}
       </group>
       
-      <ContactShadows resolution={512} scale={60} blur={2.5} opacity={0.4} far={30} color="#1C1C1A" />
+      <ContactShadows position={[0, -0.05, 0]} resolution={1024} scale={60} blur={2.4} opacity={0.55} far={10} color="#1C1C1A" />
       <Environment preset="city" />
     </>
   );
