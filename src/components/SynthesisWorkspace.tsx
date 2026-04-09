@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect, Suspense } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, PerspectiveCamera } from '@react-three/drei';
+import { OrbitControls, PerspectiveCamera, Html } from '@react-three/drei';
 import { PhotorealisticPlan3D } from './PhotorealisticPlan3D';
-import { GripVertical, Layers, Sparkles, Layout } from 'lucide-react';
+import { GripVertical, Sparkles } from 'lucide-react';
 
 interface SynthesisWorkspaceProps {
   originalUrl: string;
@@ -53,7 +53,6 @@ function ScissorManager({ sliderPos, url }: { sliderPos: number, url: string }) 
 
 export function SynthesisWorkspace({ originalUrl }: SynthesisWorkspaceProps) {
   const [sliderPos, setSliderPos] = useState(50);
-  const [isOrbitEnabled, setIsOrbitEnabled] = useState(false);
   const [isDraggingSlider, setIsDraggingSlider] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -65,7 +64,6 @@ export function SynthesisWorkspace({ originalUrl }: SynthesisWorkspaceProps) {
   };
 
   const handleMouseDown = (e: React.MouseEvent | React.TouchEvent) => {
-    // Only start dragging if clicking near the slider or in a specific zone
     setIsDraggingSlider(true);
     updateSlider('touches' in e ? e.touches[0].clientX : e.clientX);
   };
@@ -78,14 +76,6 @@ export function SynthesisWorkspace({ originalUrl }: SynthesisWorkspaceProps) {
   const handleMouseUp = () => {
     setIsDraggingSlider(false);
   };
-
-  useEffect(() => {
-    if (sliderPos > 98) {
-      setIsOrbitEnabled(true);
-    } else if (sliderPos < 95) {
-      setIsOrbitEnabled(false);
-    }
-  }, [sliderPos]);
 
   useEffect(() => {
     if (isDraggingSlider) {
@@ -105,79 +95,122 @@ export function SynthesisWorkspace({ originalUrl }: SynthesisWorkspaceProps) {
   return (
     <div 
       ref={containerRef}
-      className={`relative w-full h-full overflow-hidden bg-[#FAF9F6]`}
+      className="relative w-full h-full overflow-hidden bg-[#FAF9F6]"
     >
       {/* 3D Canvas Layer */}
       <div className="absolute inset-0 z-0">
-        <Canvas gl={{ preserveDrawingBuffer: true, antialias: true }}>
-          <PerspectiveCamera makeDefault position={[0, 48, 12]} rotation={[-Math.PI / 2.05, 0, 0]} fov={35} />
-          {/* Global Lights - One instance only to prevent shader duplication */}
-          <ambientLight intensity={0.8} />
-          <directionalLight position={[10, 20, 10]} intensity={1.2} />
-          <Suspense fallback={null}>
+        <Canvas 
+          shadows 
+          gl={{ preserveDrawingBuffer: true, antialias: true, alpha: true }}
+          camera={{ position: [25, 25, 25], fov: 40 }}
+        >
+          <PerspectiveCamera makeDefault position={[22, 22, 22]} fov={40} />
+          
+          {/* Day Cinematic Lighting */}
+          <ambientLight intensity={0.5} />
+          <directionalLight 
+            position={[10, 20, 5]} 
+            intensity={1.5} 
+            castShadow 
+            shadow-mapSize={[2048, 2048]}
+            shadow-camera-left={-20}
+            shadow-camera-right={20}
+            shadow-camera-top={20}
+            shadow-camera-bottom={-20}
+          />
+          <pointLight position={[-10, 10, -10]} intensity={0.5} color="#FFE4C4" />
+
+          <Suspense fallback={
+            <Html center>
+              <div className="flex flex-col items-center gap-4 bg-white/20 backdrop-blur-3xl px-12 py-8 rounded-[3rem] border border-white/30 shadow-2xl">
+                <div className="w-16 h-16 rounded-full border-4 border-white/10 border-t-white animate-spin" />
+                <p className="text-[10px] font-black uppercase tracking-[0.5em] text-white">Synthesizing Architecture...</p>
+              </div>
+            </Html>
+          }>
              <ScissorManager sliderPos={sliderPos} url={originalUrl} />
           </Suspense>
+
           <OrbitControls 
-            enabled={isOrbitEnabled && !isDraggingSlider}
-            maxPolarAngle={Math.PI / 2.2}
+            enableDamping
+            dampingFactor={0.05}
+            minPolarAngle={Math.PI / 6}
+            maxPolarAngle={Math.PI / 2.1}
             makeDefault
+            enabled={!isDraggingSlider}
           />
         </Canvas>
       </div>
 
       {/* Persistent HTML Slider Layer */}
-      <div 
-        className="absolute inset-0 z-10 pointer-events-none"
-      >
+      <div className="absolute inset-0 z-10 pointer-events-none">
         <div 
-            className="absolute top-0 bottom-0 w-px bg-white/40 shadow-[0_0_40px_rgba(255,255,255,1)] pointer-events-auto cursor-ew-resize group"
+            className="absolute top-0 bottom-0 w-[2px] bg-white shadow-[0_0_15px_rgba(255,255,255,0.8)] pointer-events-auto cursor-ew-resize group"
             style={{ left: `${sliderPos}%` }}
             onMouseDown={handleMouseDown}
             onTouchStart={handleMouseDown}
         >
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-4">
-               {/* Fixed Bi-Directional Handle */}
-               <div className="w-12 h-12 rounded-full bg-white shadow-2xl flex items-center justify-center border border-[#EAE6DF] hover:scale-110 active:scale-95 transition-transform">
-                 <GripVertical className="w-6 h-6 text-[#2C2C2A]" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-6">
+               {/* High-End Architectural Handle */}
+               <div className="w-14 h-14 rounded-full bg-white/10 backdrop-blur-2xl border border-white/40 shadow-[0_0_30px_rgba(255,255,255,0.3)] flex items-center justify-center group-hover:scale-110 active:scale-95 transition-all duration-300">
+                  <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-xl">
+                    <GripVertical className="w-5 h-5 text-[#1A1A1A]" />
+                  </div>
                </div>
-               {/* Label */}
-               <div className="bg-white/90 backdrop-blur-md px-3 py-1 rounded-full border border-[#EAE6DF] shadow-sm flex items-center gap-2">
-                 {sliderPos < 50 ? <Layout className="w-3 h-3 text-[#A3A79A]" /> : <Sparkles className="w-3 h-3 text-primary" />}
-                 <span className="text-[10px] font-black uppercase tracking-widest text-[#2C2C2A]">
-                    {sliderPos < 50 ? 'Blueprint 2D' : 'Synthesis 3D'}
+               
+               {/* Dynamic Mode Badge */}
+               <div className="bg-black/80 backdrop-blur-md px-5 py-2 rounded-full border border-white/10 shadow-2xl flex items-center gap-2.5 translate-y-4">
+                 <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                    <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white">
+                       {sliderPos < 50 ? 'Source Layout' : 'Synthesis Engine'}
+                    </span>
+                 </div>
+                 <div className="w-px h-3 bg-white/20" />
+                 <span className="text-[9px] font-medium text-white/60">
+                    {Math.round(sliderPos)}%
                  </span>
                </div>
             </div>
         </div>
       </div>
 
-      {/* Workspace Header */}
-      <div className="absolute top-8 left-8 right-8 z-20 flex justify-between items-start pointer-events-none">
-          <div className="bg-white/80 backdrop-blur-xl p-4 rounded-3xl border border-white/40 shadow-xl flex items-center gap-4 pointer-events-auto">
-             <div className="w-10 h-10 rounded-2xl bg-[#F4F2EC] flex items-center justify-center">
-                <Layers className="w-5 h-5 text-[#2C2C2A]" />
-             </div>
-             <div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-[#8C847A] mb-0.5">Project archive</p>
-                <p className="text-xs font-bold text-[#2C2C2A]">Synthesis_Node_v4.2</p>
+      {/* Workspace Overlays */}
+      <div className="absolute top-10 left-10 right-10 z-20 flex justify-between items-start pointer-events-none">
+          <div className="flex flex-col gap-4 pointer-events-auto">
+             <div className="bg-white/90 backdrop-blur-2xl p-5 rounded-[2.5rem] border border-white shadow-2xl flex items-center gap-5">
+                <div className="w-12 h-12 rounded-2xl bg-[#1A1A1A] flex items-center justify-center shadow-lg">
+                   <Sparkles className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                   <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#8C8C8C] mb-1">Architectural Analysis</p>
+                   <p className="text-sm font-bold text-[#1A1A1A]">Masterpiece_Synthesis_v4</p>
+                </div>
              </div>
           </div>
           
-          <div className="bg-white/80 backdrop-blur-xl px-6 py-4 rounded-full border border-white/40 shadow-xl pointer-events-auto">
-             <div className="flex items-center gap-3">
-                <div className={`w-2 h-2 rounded-full ${isOrbitEnabled ? 'bg-primary animate-pulse' : 'bg-[#A3A79A]'}`} />
-                <span className="text-[10px] font-black uppercase tracking-widest text-[#2C2C2A]">
-                   {isOrbitEnabled ? 'Reality Node Active' : 'Architectural Precision: 100%'}
-                </span>
+          <div className="flex items-center gap-4 pointer-events-auto">
+             <div className="bg-white/90 backdrop-blur-2xl px-8 py-5 rounded-full border border-white shadow-2xl flex items-center gap-4">
+                <div className="flex flex-col items-end">
+                   <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#8C8C8C]">Render Mode</p>
+                   <p className="text-xs font-bold text-[#1A1A1A]">Photorealistic Path-Tracing</p>
+                </div>
+                <div className="w-px h-8 bg-[#E5E5E5]" />
+                <div className="w-3 h-3 rounded-full bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.5)]" />
              </div>
           </div>
       </div>
 
-      {!isOrbitEnabled && (
-         <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-20 bg-black/5 backdrop-blur-3xl px-8 py-3 rounded-full border border-white/20">
-            <span className="text-[10px] font-bold text-[#2C2C2A] uppercase tracking-[0.4em]">Slide to Synthesize Space</span>
+      {/* Instructional Tooltip */}
+      <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-20">
+         <div className="bg-white/10 backdrop-blur-xl px-10 py-4 rounded-full border border-white/20 shadow-2xl group overflow-hidden">
+            <div className="relative z-10 flex items-center gap-3">
+               <span className="text-[10px] font-black text-white uppercase tracking-[0.5em] opacity-80 group-hover:opacity-100 transition-opacity">Slide to visualize reality</span>
+               <div className="w-12 h-[1px] bg-white/40 group-hover:w-20 transition-all duration-500" />
+            </div>
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
          </div>
-      )}
+      </div>
     </div>
   );
 }
