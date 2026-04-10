@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Layers, LogOut, User, ChevronDown, Smartphone, Layout, Monitor, Home, Sofa, Utensils, Bath, Bed, Wind, Building2, Briefcase } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, type Variants } from 'framer-motion';
 
 const PLATFORMS = [
   { name: 'iOS App', icon: <Smartphone className="w-4 h-4" />, desc: 'Native Apple Experience' },
@@ -47,7 +47,7 @@ const USE_CASES = [
 export function Navbar({ isSignedIn, user, onSignIn, onSignOut }: { isSignedIn: boolean, user: any, onSignIn: () => void, onSignOut: () => void }) {
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
 
-  const menuVariants = {
+  const menuVariants: Variants = {
     hidden: { opacity: 0, y: 10, scale: 0.95 },
     visible: { 
       opacity: 1, 

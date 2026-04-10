@@ -1,36 +1,35 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Upload, Cpu, Box, ArrowRight, ArrowLeft, Home, Play, Info } from 'lucide-react';
+import { useState, cloneElement, isValidElement, type ReactElement } from 'react';
+import { motion } from 'framer-motion';
+import { Upload, Cpu, Box, Home, Play, Info } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { TiltCard } from '../components/TiltCard';
 
 const steps = [
   {
     id: 1,
     title: "1. Photorealistic Synthesis",
     description: "Convert the input 2D floor plan into a photorealistic top-down 3D architectural render. We automatically strip all text, numbers, labels, and dimensions for a clean aesthetic.",
-    icon: <Upload className="w-12 h-12 text-[#8C847A]" />,
+    icon: <Upload />,
     color: "from-[#F3F2EE] to-[#EAE6DF]"
   },
   {
     id: 2,
     title: "2. Geometric Integrity",
     description: "Walls, rooms, doors, and windows follow the exact lines and positions of your original 2D sketch with zero shifting or resizing.",
-    icon: <Cpu className="w-12 h-12 text-[#2C2C2A]" />,
+    icon: <Cpu />,
     color: "from-[#2C2C2A]/5 to-[#2C2C2A]/10"
   },
   {
     id: 3,
     title: "3. Material Fidelity",
     description: "Crisp edges, balanced neutral lighting, and ultra-realistic textures (concrete, wood, glass) are applied to every surface automatically.",
-    icon: <Box className="w-12 h-12 text-[#A3A79A]" />,
+    icon: <Box />,
     color: "from-[#A3A79A]/10 to-[#A3A79A]/20"
   },
   {
     id: 4,
     title: "4. Semantic Furnishing",
     description: "We identify and place realistic furniture—beds, sofas, dining tables—exactly where they were indicated in your original 2D layout.",
-    icon: <Home className="w-12 h-12 text-[#8C847A]" />,
+    icon: <Home />,
     color: "from-[#8C847A]/10 to-[#8C847A]/20"
   }
 ];
@@ -38,9 +37,6 @@ const steps = [
 export function Preview() {
   const [currentStep, setCurrentStep] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
-
-  const nextStep = () => setCurrentStep(prev => Math.min(prev + 1, steps.length - 1));
-  const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 0));
 
   return (
     <div className="flex w-full min-h-screen items-center justify-center px-4 relative overflow-hidden bg-[#FAF9F6] pb-24">
@@ -142,17 +138,19 @@ export function Preview() {
                    className={`p-6 rounded-3xl border transition-all duration-500 cursor-pointer ${currentStep === idx ? 'bg-white border-[#EAE6DF] shadow-xl' : 'hover:bg-white/40 border-transparent'}`}
                    onClick={() => setCurrentStep(idx)}
                  >
-                   <div className="flex gap-6">
-                      <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${step.color} flex items-center justify-center shrink-0`}>
-                        {React.cloneElement(step.icon as React.ReactElement, { className: 'w-5 h-5 text-[#2C2C2A]' })}
-                      </div>
-                      <div>
-                        <h3 className="font-bold text-[#2C2C2A] mb-1">{step.title}</h3>
-                        <p className={`text-sm leading-relaxed ${currentStep === idx ? 'text-[#2C2C2A]/70' : 'text-[#8C847A]/30 line-clamp-1'}`}>
-                          {step.description}
-                        </p>
-                      </div>
-                   </div>
+                    <div className="flex gap-6">
+                       <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${step.color} flex items-center justify-center shrink-0`}>
+                         {isValidElement(step.icon) && cloneElement(step.icon as ReactElement, { 
+                           className: 'w-5 h-5 text-[#2C2C2A]' 
+                         } as any)}
+                       </div>
+                       <div>
+                         <h3 className="font-bold text-[#2C2C2A] mb-1">{step.title}</h3>
+                         <p className={`text-sm leading-relaxed ${currentStep === idx ? 'text-[#2C2C2A]/70' : 'text-[#8C847A]/30 line-clamp-1'}`}>
+                           {step.description}
+                         </p>
+                       </div>
+                    </div>
                  </motion.div>
                ))}
             </div>
