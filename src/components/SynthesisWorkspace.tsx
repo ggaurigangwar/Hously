@@ -1,54 +1,12 @@
 import { useState, useRef, useEffect, Suspense } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera, Html } from '@react-three/drei';
 import { PhotorealisticPlan3D } from './PhotorealisticPlan3D';
 import { GripVertical, Sparkles } from 'lucide-react';
 
 interface SynthesisWorkspaceProps {
   originalUrl: string;
-}
-
-function ScissorManager({ sliderPos, url }: { sliderPos: number, url: string }) {
-  const group2d = useRef<any>(null);
-  const group3d = useRef<any>(null);
-
-  useFrame((state) => {
-    const { gl, scene, camera, size } = state;
-    const splitX = (sliderPos / 100) * size.width;
-    
-    gl.autoClear = false;
-    gl.clear();
-    gl.setScissorTest(true);
-
-    if (group2d.current && group3d.current) {
-        // Left: 2D Blueprint (drawing mode)
-        group2d.current.visible = true;
-        group3d.current.visible = false;
-        gl.setScissor(0, 0, splitX, size.height);
-        gl.setViewport(0, 0, size.width, size.height);
-        gl.render(scene, camera);
-
-        // Right: 3D Reality (photorealistic mode)
-        group2d.current.visible = false;
-        group3d.current.visible = true;
-        gl.setScissor(splitX, 0, size.width - splitX, size.height);
-        gl.setViewport(0, 0, size.width, size.height);
-        gl.render(scene, camera);
-    }
-
-    gl.setScissorTest(false);
-  }, 1);
-
-  return (
-    <>
-      <group ref={group2d}>
-        <PhotorealisticPlan3D url={url} mode="2d" />
-      </group>
-      <group ref={group3d}>
-        <PhotorealisticPlan3D url={url} mode="3d" />
-      </group>
-    </>
-  );
+  projectName?: string;
 }
 
 export function SynthesisWorkspace({ originalUrl }: SynthesisWorkspaceProps) {
@@ -97,38 +55,37 @@ export function SynthesisWorkspace({ originalUrl }: SynthesisWorkspaceProps) {
       ref={containerRef}
       className="relative w-full h-full overflow-hidden bg-[#FAF9F6]"
     >
-      {/* 3D Canvas Layer */}
+      {/* Dynamic 3D Morphing Engine Layer */}
       <div className="absolute inset-0 z-0">
         <Canvas 
           shadows 
-          gl={{ preserveDrawingBuffer: true, antialias: true, alpha: true }}
+          gl={{ 
+            preserveDrawingBuffer: true, 
+            antialias: true, 
+            alpha: true,
+            powerPreference: "high-performance"
+          }}
           camera={{ position: [25, 25, 25], fov: 40 }}
         >
           <PerspectiveCamera makeDefault position={[22, 22, 22]} fov={40} />
           
-          {/* Day Cinematic Lighting */}
-          <ambientLight intensity={0.5} />
+          <ambientLight intensity={0.2} />
           <directionalLight 
             position={[10, 20, 5]} 
-            intensity={1.5} 
+            intensity={1.2} 
             castShadow 
-            shadow-mapSize={[2048, 2048]}
-            shadow-camera-left={-20}
-            shadow-camera-right={20}
-            shadow-camera-top={20}
-            shadow-camera-bottom={-20}
+            shadow-mapSize={[1024, 1024]}
           />
-          <pointLight position={[-10, 10, -10]} intensity={0.5} color="#FFE4C4" />
 
           <Suspense fallback={
             <Html center>
               <div className="flex flex-col items-center gap-4 bg-white/20 backdrop-blur-3xl px-12 py-8 rounded-[3rem] border border-white/30 shadow-2xl">
                 <div className="w-16 h-16 rounded-full border-4 border-white/10 border-t-white animate-spin" />
-                <p className="text-[10px] font-black uppercase tracking-[0.5em] text-white">Synthesizing Architecture...</p>
+                <p className="text-[10px] font-black uppercase tracking-[0.5em] text-white">Synthesizing Reality...</p>
               </div>
             </Html>
           }>
-             <ScissorManager sliderPos={sliderPos} url={originalUrl} />
+             <PhotorealisticPlan3D url={originalUrl} sliderPos={sliderPos} />
           </Suspense>
 
           <OrbitControls 
